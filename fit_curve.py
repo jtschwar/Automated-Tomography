@@ -3,7 +3,7 @@ from scipy import optimize
 import numpy as np 
 
 #Theta(Degrees), Y-Coordinate(Micron)
-coord = np.loadtxt('coordinates.txt', delimiter='', usecols=range(5))
+coord = np.loadtxt('coordinates.txt', usecols=range(5))
 
 y_coord = coord[:,1]
 
@@ -20,7 +20,7 @@ def fit_cos(x,a,b,c):
 # Curve Fitting
 params, params_covariance = optimize.curve_fit(fit_cos, alpha, y_coord)
 np.savetxt('model_fit.txt', params) #Save parameters
-print('Fitted Parameters' + str(params))
+print('Fitted Parameters: ' + str(params))
 
 # #Plot Fitted Model
 x = np.linspace(-np.pi/2, np.pi/2)
