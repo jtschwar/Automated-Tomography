@@ -3,20 +3,23 @@ from scipy import optimize
 import numpy as np 
 
 #Theta(Degrees), Y-Coordinate(Micron)
-coord = np.loadtxt('y_coordinates.txt', delimiter=',', usecols=range(2))
+coord = np.loadtxt('coordinates.txt', delimiter='', usecols=range(5))
+
+y_coord = coord[:,1]
 
 #Convert from Degrees or Radians. 
-coord[:,0] *= np.pi/180
+alpha = coord[:,3] * np.pi/180
 
 #Plot Data Points. 
-plt.scatter(coord[:,0], coord[:,1], label='Data')
+plt.scatter(alpha, y_coord, label='Data')
 
 #Functional Form
 def fit_cos(x,a,b,c):
 	return a*np.cos(b*x+c)
 
 # Curve Fitting
-params, params_covariance = optimize.curve_fit(fit_cos, coord[:,0], coord[:,1])
+params, params_covariance = optimize.curve_fit(fit_cos, alpha, y_coord)
+np.savetxt('model_fit.txt', params) #Save parameters
 print('Fitted Parameters' + str(params))
 
 # #Plot Fitted Model
