@@ -2,8 +2,8 @@ from matplotlib import pyplot as plt
 from scipy import optimize
 import numpy as np 
 
-#Theta(Degrees), Y-Coordinate(Micron)
-coord = np.loadtxt('coordinates.txt', usecols=range(5))
+#Coordinates are saved as (x,y,z,alpha,beta) => (microns, degrees)
+coord = np.loadtxt('coordinates.txt', delimiter=',', usecols=range(5))
 
 y_coord = coord[:,1]
 
