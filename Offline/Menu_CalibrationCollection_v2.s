@@ -119,12 +119,15 @@ class MainMenu : uiframe
 	
 	void Save(object self)
 	{
+		result("Save Pressed\n")
 		SaveFunction(self, 0)
 	}
 	
 	void capture(object self)
 	{
+		result("Capture pressed\n")
 		captureFunction(self)
+		result("Capture Complete\n")
 	}
 	
 	
