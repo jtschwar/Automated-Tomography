@@ -199,9 +199,8 @@ class MainMenu : uiframe
 	void Tilt(object self)
 	{
 		number tilt = DLGGetValue(self.lookupelement("currenttiltfield"))
-		number anglechange = (DLGGetValue(self.lookupelement("deltaTiltField")))
-		number newtilt = anglechange + tilt
-		EMSetStageAlpha(newtilt)
+		number anglechange = (DLGGetValue(self.lookupelement("deltatiltfield")))
+		EMSetStageAlpha(anglechange + tilt)
 		EMWaitUntilReady()
 	}
 	
@@ -212,7 +211,7 @@ class MainMenu : uiframe
 		newY = DLGGetValue(self.lookupelement("nextY"))
 		newZ = DLGGetValue(self.lookupelement("nextZ"))
 		
-		EMSetStagePositions(7,nextX,nextY,nextZ,0,0)
+		EMSetStagePositions(7,newX,newY,newZ,0,0)
 		//Use necessary absolute EM commands
 		EMWaitUntilReady()
 	}
@@ -221,6 +220,7 @@ class MainMenu : uiframe
 	{
 		captureFunction(self)
 		saveFunction(self,1)
+		DSInvokeButton(1)
 		
 		//Add Refresh code, DLGValue w/ read in terms
 		//Reset Current Values

@@ -233,7 +233,7 @@ void SaveFunction(object given, number fieldNo)
 
 
         substituted_string = substituted_string.right(len(substituted_string)-2)
-        SaveAsGatan(curr,save_path+substituted_string)
+        SaveAsGatan3(curr,save_path+substituted_string)
 
         okdialog("Saved as: \n"+substituted_string+"\n")
     }
@@ -274,9 +274,6 @@ TagGroup MakeSaveDialog()
         box1_items.dlgAddElement(SaveTable)
         box1_items.dlgAddElement(ExpressionsLabel)
         box1_items.dlgAddElement(SaveStringTable)
-        
-        
-        
         
         return box1
     }

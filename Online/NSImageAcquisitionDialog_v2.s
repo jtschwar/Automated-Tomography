@@ -106,6 +106,8 @@ void captureFunction(object given)
 		stack[0,0,i,cDim,CDim,i+1]=curr
 		DeleteImage(curr)
 	}
+	ShowImage(stack)
+	//Code to save image
 	
 }
 
