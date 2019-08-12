@@ -143,8 +143,10 @@ void SaveFunction(object given, number fieldNo)
         //result(FindNextKeyName(self,"asdf%r%",0));
         number pos = 0;
         String substituted_string = "$";
+        
         while(pos < len(save_string))
         {
+			break;
             //result(findnextkeyname(  self, save_string, pos ));
             number oldPos = pos;
             String next_key = findnextkeyname( save_string, pos );
@@ -166,51 +168,51 @@ void SaveFunction(object given, number fieldNo)
             else if(next_key=="V")//Voltage
             {
                 //added = "[voltage]"
-                //added = ""+EMGetHighTension( );
+                added = ""+EMGetHighTension( );
             }
             else if(next_key=="M")//Mag
             {
-                //added = ""+EMGetMagnification( );
+                added = ""+EMGetMagnification( );
 
             }
             else if(next_key=="L")//cam len
             {
-                //added = ""+EMGetCameraLength();
+                added = ""+EMGetCameraLength();
 
             }
             else if(next_key=="O")//operation mode
             {
-               // added = ""+EMGetOperationMode( );
+                added = ""+EMGetOperationMode( );
 
             }
             else if(next_key=="R")//Brightness
             {
-                //added = ""+EMGetBrightness();
+                added = ""+EMGetBrightness();
 
             }
             else if(next_key=="S")
             {
-                //added=""+EMGetSpotSize( );
+                added=""+EMGetSpotSize( );
             }
             else if(next_key=="A")
             {
-               // added=""+EMGetStageAlpha( );
+                added=""+EMGetStageAlpha( );
             }
             else if(next_key=="B")
             {
-                //added = ""+EMGetStageBeta();
+                added = ""+EMGetStageBeta();
             }
             else if(next_key=="X")
             {
-                //added=""+EMGetStageX();
+                added=""+EMGetStageX();
             }
             else if(next_key=="Y")
             {
-                //added=""+EMGetStageY();
+                added=""+EMGetStageY();
             }
             else if(next_key=="Z")
             {
-                //added=""+EMGetStageZ();
+                added=""+EMGetStageZ();
             }
             else if(next_key != "")
             {
@@ -231,7 +233,7 @@ void SaveFunction(object given, number fieldNo)
 
         Image curr := getFrontImage();
 
-
+		
         substituted_string = substituted_string.right(len(substituted_string)-2)
         SaveAsGatan3(curr,save_path+substituted_string)
 
@@ -255,8 +257,8 @@ TagGroup MakeSaveDialog()
         SaveTable.dlgtablelayout(2,1,0)
         
         TagGroup SaveStringLabel = DLGCreateLabel("Save String:")
-        TagGroup SaveStringField = DLGCreateStringField("%T%_%V%kV_%M%X_%L%cm_",80).dlgidentifier("SaveStringField1");
-        TagGroup SaveButton = DLGCreatePushButton("Save Front Image","Save1")
+        TagGroup SaveStringField = DLGCreateStringField("%T%_%V%kV_%M%X_%L%cm_",80).dlgidentifier("SaveStringField");
+        TagGroup SaveButton = DLGCreatePushButton("Save Front Image","Save")
         
         TagGroup SaveStringTable = DLGGroupItems(SaveStringLabel, SaveStringField, SaveButton)
         SaveStringTable.DLGTableLayout(3,1,0)

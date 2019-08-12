@@ -120,6 +120,7 @@ class MainMenu : uiframe
 	void Save(object self)
 	{
 		SaveFunction(self, 0)
+		okdialog("Correct runthrough\n")
 	}
 	
 	void capture(object self)
@@ -180,7 +181,7 @@ class MainMenu : uiframe
 		C = val(temporary_Line)
 		//result("\n"+A+"\n"+B+"\n"+C+"\n")
 		
-		//EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
+		EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
 		dlgvalue(self.lookupelement("currX"), imagex)
 		dlgvalue(self.lookupelement("currY"), imagey)
 		dlgvalue(self.lookupelement("currZ"), imagez)

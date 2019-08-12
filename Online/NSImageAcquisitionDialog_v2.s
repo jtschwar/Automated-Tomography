@@ -81,12 +81,12 @@ void captureFunction(object given)
 	{
 		detectChecks += 1
 		
-		DSSetParametersSignal(paramID,0,dataDepth,acquire,imageID)
+	//	DSSetParametersSignal(paramID,0,dataDepth,acquire,imageID)
 	}
 	if(dlgGetValue(given.lookupelement("detect2_check")))
 	{	
 		detectChecks += 1
-		DSSetParametersSignal(paramID,0,dataDepth,acquire,imageID)
+	//	DSSetParametersSignal(paramID,0,dataDepth,acquire,imageID)
 	}
 	if (detectChecks == 0)
 	{
