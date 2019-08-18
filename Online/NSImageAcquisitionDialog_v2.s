@@ -102,6 +102,11 @@ void captureFunction(object given)
 	for (i = 0; i < cImageNum; i++)
 	{
 		DSStartAcquisition(paramID,0,1)
+		if(!getFrontImage())
+		{
+			okdialog("Image Not Created! \nCheck Imaging system"
+			return
+		}
 		image curr:= getFrontImage()
 		stack[0,0,i,cDim,CDim,i+1]=curr
 		DeleteImage(curr)

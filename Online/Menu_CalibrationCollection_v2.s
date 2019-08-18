@@ -45,9 +45,9 @@ TagGroup TomoDialog()
 	
 	//Tilt Column
 	TagGroup TiltButton = DLGCreatePushbutton("Tilt", "tilt")
-	TagGroup CurrTiltField = DLGCreateRealField(currenttilt, 5, 5).dlgidentifier("currenttiltfield")
+	TagGroup CurrTiltField = DLGCreateRealField(currenttilt, 7, 5).dlgidentifier("currenttiltfield")
 	TagGroup CurrtiltField_Label = DLGCreateLabel("Current Tilt: " )
-	TagGroup deltaTiltField = DLGCreateRealField(deltaTilt, 5, 5).dlgidentifier("deltatiltfield")
+	TagGroup deltaTiltField = DLGCreateRealField(deltaTilt, 7, 5).dlgidentifier("deltatiltfield")
 	TagGroup DeltaTiltField_Label = DLGCreateLabel("Step Field: ")
 	
 	TagGroup TiltOptions = DLGGroupItems(currtiltField_Label, currTiltField,DeltatiltField_Label, deltaTiltField).dlgtablelayout(2,2,0)
@@ -62,15 +62,15 @@ TagGroup TomoDialog()
 	TagGroup ZLabel = DLGCreateLabel("Z")
 	
 	TagGroup CurrLabel = DLGCreateLabel("Current: ")
-	TagGroup CurrX = DLGCreateRealField(0,5,5).dlgidentifier("currX")
-	TagGroup CurrY = DLGCreateRealField(0,5,5).dlgidentifier("currY")
-	TagGroup CurrZ = DLGCreateRealField(0,5,5).dlgidentifier("currZ")
+	TagGroup CurrX = DLGCreateRealField(0,8,5).dlgidentifier("currX")
+	TagGroup CurrY = DLGCreateRealField(0,8,5).dlgidentifier("currY")
+	TagGroup CurrZ = DLGCreateRealField(0,8,5).dlgidentifier("currZ")
 	//TagGroup CurrRow = DLGgroupitems(CurrLabel,CurrX,CurrY,CurrZ).DLGtablelayout(4,1,0)
 	
 	TagGroup NextLabel = DLGCreateLabel("Next: ")
-	TagGroup NextX = DLGCreateRealField(0,5,5).dlgidentifier("nextX")
-	TagGroup NextY = DLGCreateRealField(0,5,5).dlgidentifier("nextY")
-	TagGroup NextZ = DLGCreateRealField(0,5,5).dlgidentifier("nextZ")
+	TagGroup NextX = DLGCreateRealField(0,8,5).dlgidentifier("nextX")
+	TagGroup NextY = DLGCreateRealField(0,8,5).dlgidentifier("nextY")
+	TagGroup NextZ = DLGCreateRealField(0,8,5).dlgidentifier("nextZ")
 	//TagGroup NextRow = DLGGroupItems(NextLabel,NextX,NextY,NextZ).DLGTableLayout(4,1,0)
 	
 	TagGroup LeftestColumn = DLGGroupItems(EmptyLabel,CurrLabel,NextLabel).dlgTableLayout(1,3,1)
@@ -135,7 +135,7 @@ class MainMenu : uiframe
 	{
 		result("Acquired!\n")
 		EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
-		output = output +imagex+","+imagey+","+imagez+","+alpha+","+beta+"\n"
+		output = output +alpha+","+imagex+","+imagey+","+imagez+","+beta+"\n"
 		capturefunction(self)
 		savefunction(self,1)
 	}
@@ -202,8 +202,8 @@ class MainMenu : uiframe
 	{
 		number tilt = DLGGetValue(self.lookupelement("currenttiltfield"))
 		number anglechange = (DLGGetValue(self.lookupelement("deltatiltfield")))
-		//EMSetStageAlpha(anglechange + tilt)
-		//EMWaitUntilReady()
+		EMSetStageAlpha(anglechange + tilt)
+		EMWaitUntilReady()
 	}
 	
 	void Shift(object self)
@@ -213,15 +213,25 @@ class MainMenu : uiframe
 		newY = DLGGetValue(self.lookupelement("nextY"))
 		newZ = DLGGetValue(self.lookupelement("nextZ"))
 		
-		//EMSetStagePositions(7,newX,newY,newZ,0,0)
+		EMSetStagePositions(7,newX,newY,newZ,0,0)
 		//Use necessary absolute EM commands
-		//EMWaitUntilReady()
+		EMWaitUntilReady()
 	}
 	
 	void acquire(object self)
 	{
 		captureFunction(self)
 		saveFunction(self,1)
+		
+		string directory
+		DLGgetValue(self.lookupelement("SavePathField"),directory)
+		string fullpath = directory + export_file_name
+		number file = OpenFileForWriting(fullpath)
+		object myStream = newstreamfromfilerefrence(file)
+		
+		EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
+		WriteFile(file,alpha+","+imagex+","+imagey+","+imagez+","+beta+"\n") 
+		
 		DSInvokeButton(1)
 		
 		//Add Refresh code, DLGValue w/ read in terms
