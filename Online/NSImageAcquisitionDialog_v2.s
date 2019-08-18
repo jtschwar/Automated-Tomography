@@ -1,7 +1,7 @@
 //Inspired by Noah Schnitzer's AcqInterface code, should allow 
 //for definition of image#, dwelltime, dimension and be installable
-//NEEDED: NSSaveDialog
 //and usable via simple procedure
+//NEEDED: NSSaveDialog
 //By Jacob Pietryga 23 July 2019
 
 //SUB FUNCTIONS
@@ -75,18 +75,18 @@ void captureFunction(object given)
 	image stack = NewImage("stack",2,cDim,cDim,cImageNum)
 	
 	
-	result(dlgGetValue(given.lookupelement("detect1_check")))
-	result(dlgGetValue(given.lookupelement("detect2_check")))
+	//result(dlgGetValue(given.lookupelement("detect1_check")))
+	//result(dlgGetValue(given.lookupelement("detect2_check")))
 	if(dlgGetValue(given.lookupelement("detect1_check")))
 	{
 		detectChecks += 1
 		
-	//	DSSetParametersSignal(paramID,0,dataDepth,acquire,imageID)
+		DSSetParametersSignal(paramID,0,dataDepth,acquire,imageID)
 	}
 	if(dlgGetValue(given.lookupelement("detect2_check")))
 	{	
 		detectChecks += 1
-	//	DSSetParametersSignal(paramID,0,dataDepth,acquire,imageID)
+		DSSetParametersSignal(paramID,0,dataDepth,acquire,imageID)
 	}
 	if (detectChecks == 0)
 	{

@@ -109,7 +109,7 @@ class MainMenu : uiframe
 	object Launch(object self)
 	{
 		self.init(self.ButtonCreate())
-		self.Pose()
+		self.Display("CA-Tomography")
 	}
 	//Acquisition and Save Script's Buttons
 	void SetPath(object self)
@@ -120,19 +120,20 @@ class MainMenu : uiframe
 	void Save(object self)
 	{
 		SaveFunction(self, 0)
-		okdialog("Correct runthrough\n")
+		okdialog("Correct run-through\n")
 	}
 	
 	void capture(object self)
 	{
 		captureFunction(self)
+		okdialog("Capture Complete!")
 	}
 	
 	
 	//Calibration Buttons
 	void coordinate(object self)
 	{
-		result("Acquired!")
+		result("Acquired!\n")
 		EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
 		output = output +imagex+","+imagey+","+imagez+","+alpha+","+beta+"\n"
 		capturefunction(self)
@@ -141,7 +142,7 @@ class MainMenu : uiframe
 	
 	void Export(object self)
 	{
-		result("Exported")
+		result("Exported\n")
 		string directory
 		DLGgetValue(self.lookupelement("SavePathField"),directory)
 		string fullpath = directory + export_file_name
@@ -201,8 +202,8 @@ class MainMenu : uiframe
 	{
 		number tilt = DLGGetValue(self.lookupelement("currenttiltfield"))
 		number anglechange = (DLGGetValue(self.lookupelement("deltatiltfield")))
-		EMSetStageAlpha(anglechange + tilt)
-		EMWaitUntilReady()
+		//EMSetStageAlpha(anglechange + tilt)
+		//EMWaitUntilReady()
 	}
 	
 	void Shift(object self)
@@ -212,9 +213,9 @@ class MainMenu : uiframe
 		newY = DLGGetValue(self.lookupelement("nextY"))
 		newZ = DLGGetValue(self.lookupelement("nextZ"))
 		
-		EMSetStagePositions(7,newX,newY,newZ,0,0)
+		//EMSetStagePositions(7,newX,newY,newZ,0,0)
 		//Use necessary absolute EM commands
-		EMWaitUntilReady()
+		//EMWaitUntilReady()
 	}
 	
 	void acquire(object self)

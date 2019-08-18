@@ -11,7 +11,7 @@
 
 
 //SUB FUNCTIONS
-string FindNextKeyName(string input, number & searchPos )
+string FindNextKeyName( object self, string input, number & searchPos )
     {
         number totalLength = len( input )
         number start = 0, end = 0
@@ -128,6 +128,7 @@ void SetPathFunction(object given)
 
 void SaveFunction(object given, number fieldNo)
     {
+       	//result("asdf"+field_number)
         String save_path = "";
         dlggetvalue(given.lookupelement("SavePathField"), save_path);
         if(save_path == "[NO PATH]")
@@ -143,13 +144,11 @@ void SaveFunction(object given, number fieldNo)
         //result(FindNextKeyName(self,"asdf%r%",0));
         number pos = 0;
         String substituted_string = "$";
-        
         while(pos < len(save_string))
         {
-			break;
             //result(findnextkeyname(  self, save_string, pos ));
             number oldPos = pos;
-            String next_key = findnextkeyname( save_string, pos );
+            String next_key = findnextkeyname(  given, save_string, pos );
             String added = "";
 
 
@@ -167,22 +166,22 @@ void SaveFunction(object given, number fieldNo)
             }
             else if(next_key=="V")//Voltage
             {
-                //added = "[voltage]"
-                added = ""+EMGetHighTension( );
+                added = "[voltage]"
+                added = ""+EMGetHighTension( )/1000; //kv
             }
             else if(next_key=="M")//Mag
             {
-                added = ""+EMGetMagnification( );
+                added = ""+EMGetMagnification( )/1e6; // *1,000,000 (1e6)
 
             }
             else if(next_key=="L")//cam len
             {
-                added = ""+EMGetCameraLength();
+                added = ""+EMGetCameraLength()/10; //cm
 
             }
             else if(next_key=="O")//operation mode
             {
-                added = ""+EMGetOperationMode( );
+                added = ""+EMGetIlluminationMode( );
 
             }
             else if(next_key=="R")//Brightness
@@ -231,11 +230,12 @@ void SaveFunction(object given, number fieldNo)
             //result(substituted_string+"\n")
         }
 
-        Image curr := getFrontImage();
+        Image curr:= getFrontImage();
 
-		
+
         substituted_string = substituted_string.right(len(substituted_string)-2)
         SaveAsGatan3(curr,save_path+substituted_string)
+        DeleteImage(curr)
 
         okdialog("Saved as: \n"+substituted_string+"\n")
     }
@@ -255,9 +255,9 @@ TagGroup MakeSaveDialog()
         
         TagGroup SaveTable = DLGGroupItems(savePathField,setSave)
         SaveTable.dlgtablelayout(2,1,0)
-        
+        //Size Voltage SpotSize Alpha Beta
         TagGroup SaveStringLabel = DLGCreateLabel("Save String:")
-        TagGroup SaveStringField = DLGCreateStringField("%T%_%V%kV_%M%X_%L%cm_",80).dlgidentifier("SaveStringField");
+        TagGroup SaveStringField = DLGCreateStringField("%D%_%T%_%V%kV_%S%_%M%X_%L%cm_%A%alpha",80).dlgidentifier("SaveStringField");
         TagGroup SaveButton = DLGCreatePushButton("Save Front Image","Save")
         
         TagGroup SaveStringTable = DLGGroupItems(SaveStringLabel, SaveStringField, SaveButton)
