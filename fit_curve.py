@@ -39,7 +39,7 @@ def check_coord():
 def fit_curve():
 
     #Coordinates are saved as (x,y,z,alpha,beta) => (microns, degrees)
-    coord = np.loadtxt('coordinates.txt', delimiter=',', usecols=range(5))
+    coord = np.loadtxt('Coordinate.txt', delimiter=',', usecols=range(5))
     y_coord = coord[:,1]
     alpha_coord = coord[:,3] * np.pi/180
 
