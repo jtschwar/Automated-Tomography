@@ -286,7 +286,7 @@ class MainMenu : uiframe
 		number newX,newY,newZ
 		newX = DLGGetValue(self.lookupelement("nextX"))
 		newY = DLGGetValue(self.lookupelement("nextY"))
-		newZ = DLGGetValue(self.lookupelement("nextZ"))
+		newZ = DLGGetValue(self.lookupelement("nextZ"))*1000
 		
 		EMSetStagePositions(3,newX,newY,newZ,0,0)
 		EMSetCalibratedfocus(newZ)
