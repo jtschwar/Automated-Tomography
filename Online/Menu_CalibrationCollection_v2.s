@@ -185,7 +185,7 @@ class MainMenu : uiframe
 		}
 		img1 := getfrontimage()
 		
-		//EMSetStageAlpha(EMGetStageAlpha()+5)  //Tilts slightly
+		EMSetStageAlpha(EMGetStageAlpha()+5)  //Tilts slightly
 		captureFunction(self)
 		if (!getfrontimage(img2))
 		{
@@ -194,21 +194,19 @@ class MainMenu : uiframe
 		}
 		img2 := getfrontimage()
 		
-		if (img1==1)
+		Correlation(img1,img2,xshift,yshift)
+		if (xshift==yshift)
 		{
-			okdialog("Same image was used, check for errors")
+			okdialog("Same image used, or no tilt occurred. \nCheck for errors!")
 			return
 		}
-		
-		Correlation(img1,img2,xshift,yshift)
-		
 		theta_offset = atan(xshift/yshift)  //Assumption: X-axis is ideal tilt axis, so Y direction is ideally only shift.
 		dlgvalue(self.lookupelement("tiltoffsetfield"),theta_offset)
 	}
 	void coordinate(object self)
 	{
 		result("Acquired!\n")
-		//EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
+		EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
 		output = output +alpha+","+imagex+","+imagey+","+imagez+","+beta+"\n"
 		capturefunction(self)
 		savefunction(self,1)
@@ -226,7 +224,7 @@ class MainMenu : uiframe
 		CloseFile(file)
 	}
 	
-	//Tomography Buttons
+	Tomography Buttons
 	void Load(object self)
 	{
 		string directory
@@ -256,7 +254,7 @@ class MainMenu : uiframe
 		C = val(temporary_Line)
 		//result("\n"+A+"\n"+B+"\n"+C+"\n")
 		
-		//EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
+		EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
 		dlgvalue(self.lookupelement("currX"), imagex)
 		dlgvalue(self.lookupelement("currY"), imagey)
 		dlgvalue(self.lookupelement("currZ"), imagez)
@@ -276,8 +274,8 @@ class MainMenu : uiframe
 	{
 		number tilt = DLGGetValue(self.lookupelement("currenttiltfield"))
 		number anglechange = (DLGGetValue(self.lookupelement("deltatiltfield")))
-		//EMSetStageAlpha(anglechange + tilt)
-		//EMWaitUntilReady()
+		EMSetStageAlpha(anglechange + tilt)
+		EMWaitUntilReady()
 	}
 	
 	void Shift(object self)
@@ -287,9 +285,9 @@ class MainMenu : uiframe
 		newY = DLGGetValue(self.lookupelement("nextY"))
 		newZ = DLGGetValue(self.lookupelement("nextZ"))
 		
-		//EMSetStagePositions(7,newX,newY,newZ,0,0)
+		EMSetStagePositions(7,newX,newY,newZ,0,0)
 		//Use necessary absolute EM commands
-		//EMWaitUntilReady()
+		EMWaitUntilReady()
 	}
 	
 	void acquire(object self)
@@ -303,14 +301,14 @@ class MainMenu : uiframe
 		number file = OpenFileForWriting(fullpath)
 		
 		
-		//EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
+		EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
 		WriteFile(file,alpha+","+imagex+","+imagey+","+imagez+","+beta+"\n") 
 		
-		//DSInvokeButton(1)
+		DSInvokeButton(1)
 		
 		//Add Refresh code, DLGValue w/ read in terms
 		//Reset Current Values
-		//EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
+		EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
 		dlgvalue(self.lookupelement("currX"), imagex)
 		dlgvalue(self.lookupelement("currY"), imagey)
 		dlgvalue(self.lookupelement("currZ"), imagez)
@@ -325,7 +323,7 @@ class MainMenu : uiframe
 		dlgvalue(self.lookupelement("nextY"), A * cos(B*nextAngle + C))
 		dlgValue(self.lookupelement("nextZ"), A * sin(B*nextAngle + C))
 		
-		//EMWaitUntilReady()
+		EMWaitUntilReady()
 	}
 	
 }

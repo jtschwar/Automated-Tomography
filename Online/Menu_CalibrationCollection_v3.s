@@ -102,27 +102,23 @@ TagGroup TomoDialog()
 	TagGroup XLabel = DLGCreateLabel("X")
 	TagGroup YLabel = DLGCreateLabel("Y")
 	TagGroup ZLabel = DLGCreateLabel("Z")
-	TagGroup DefocusLabel = DLGCreateLabel("Defocus")
 	
 	TagGroup CurrLabel = DLGCreateLabel("Current: ")
 	TagGroup CurrX = DLGCreateRealField(0,9,5).dlgidentifier("currX")
 	TagGroup CurrY = DLGCreateRealField(0,9,5).dlgidentifier("currY")
 	TagGroup CurrZ = DLGCreateRealField(0,9,5).dlgidentifier("currZ")
-	TagGroup CurrDefocus = DLGCreateRealField(0,9,5).dlgidentifier("currDefocus")
 	//TagGroup CurrRow = DLGgroupitems(CurrLabel,CurrX,CurrY,CurrZ).DLGtablelayout(4,1,0)
 	
 	TagGroup NextLabel = DLGCreateLabel("Next: ")
 	TagGroup NextX = DLGCreateRealField(0,9,5).dlgidentifier("nextX")
 	TagGroup NextY = DLGCreateRealField(0,9,5).dlgidentifier("nextY")
 	TagGroup NextZ = DLGCreateRealField(0,9,5).dlgidentifier("nextZ")
-	TagGroup NextDefocus = DLGCreateRealField(0,9,5).dlgidentifier("nextDefocus")
 	//TagGroup NextRow = DLGGroupItems(NextLabel,NextX,NextY,NextZ).DLGTableLayout(4,1,0)
 	
 	TagGroup LeftestColumn = DLGGroupItems(EmptyLabel,CurrLabel,NextLabel).dlgTableLayout(1,3,1)
 	TagGroup MidLeftColumn = DLGGroupitems(XLabel,Currx,NextX).DLGTableLayout(1,3,1)
 	TagGroup MidRightColumn = DLGGroupitems(YLabel, CurrY,NextY).DLGTableLayout(1,3,1)
-	//Taggroup RightestColumn = DLGGroupItems(ZLabel,CurrZ,NextZ).DLGTableLAyout(1,3,1)
-	Taggroup RightestColumn = DLGGroupItems(defocusLabel,CurrDefocus,NextDefocus).DLGTableLAyout(1,3,1)
+	Taggroup RightestColumn = DLGGroupItems(ZLabel,CurrZ,NextZ).DLGTableLAyout(1,3,1)
 	TagGroup ShiftValueTable = DLGGroupItems(LeftestColumn,MidLeftColumn,MidRightColumn,RightestColumn).DLGTableLayout(4,1,0)
 	//TagGroup TotalTable = DLGGroupItems(EmptyLabel,XLabel,YLabel,ZLabel,CurrLabel,CurrX,CurrY,CurrZ,NextLabel,NextX,NextY,NextZ).DLGTableLayout(4,3,1)
 	//TagGroup ShiftColumn = DLGGroupItems(ShiftButton,TotalTable).DLGTableLayout(1,2,0)
@@ -157,6 +153,7 @@ class MainMenu : uiframe
 		self.init(self.ButtonCreate())
 		self.Display("CA-Tomography")
 	}
+	
 	//Acquisition and Save Script's Buttons
 	void SetPath(object self)
 	{
@@ -189,7 +186,7 @@ class MainMenu : uiframe
 		}
 		img1 := getfrontimage()
 		
-		//EMSetStageAlpha(EMGetStageAlpha()+5)  //Tilts slightly
+		EMSetStageAlpha(EMGetStageAlpha()+5)  //Tilts slightly
 		captureFunction(self)
 		if (!getfrontimage(img2))
 		{
@@ -210,7 +207,8 @@ class MainMenu : uiframe
 	void coordinate(object self)
 	{
 		result("Acquired!\n")
-		//EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
+		EMGetStagePositions(27,imagex,imagey,imagez,alpha,beta)
+		imagez = EMGetCalibratedFocus/1000
 		output = output +alpha+","+imagex+","+imagey+","+imagez+","+beta+"\n"
 		capturefunction(self)
 		savefunction(self,1)
@@ -258,12 +256,11 @@ class MainMenu : uiframe
 		C = val(temporary_Line)
 		//result("\n"+A+"\n"+B+"\n"+C+"\n")
 		
-		//EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
-		
+		EMGetStagePositions(27,imagex,imagey,imagez,alpha,beta)
+		imagez = EMgetcalibratedfocus()/1000
 		dlgvalue(self.lookupelement("currX"), imagex)
 		dlgvalue(self.lookupelement("currY"), imagey)
-		//dlgvalue(self.lookupelement("currZ"), imagez)
-		dlgvalue(self.lookupelement("currDefocus"), EMGetCalibratedFocus()/1000)
+		dlgvalue(self.lookupelement("currZ"), imagez)
 		dlgValue(self.lookupelement("currenttiltfield"), alpha)
 		
 		
@@ -271,8 +268,7 @@ class MainMenu : uiframe
 		number nextAngle = (alpha + DLGGetValue(self.lookupelement("deltatiltfield")))*Pi()/180
 		dlgvalue(self.lookupelement("nextX"), imageX)
 		dlgvalue(self.lookupelement("nextY"), A * cos(B*nextAngle + C))
-		//dlgValue(self.lookupelement("nextZ"), A * sin(B*nextAngle + C))
-		dlgValue(self.lookupelement("nextDefocus"),(A * sin(B*nextAngle + C)))
+		dlgValue(self.lookupelement("nextZ"), A * sin(B*nextAngle + C))
 		
 		closefile(file)
 	}
@@ -281,27 +277,21 @@ class MainMenu : uiframe
 	{
 		number tilt = DLGGetValue(self.lookupelement("currenttiltfield"))
 		number anglechange = (DLGGetValue(self.lookupelement("deltatiltfield")))
-		//EMSetStageAlpha(anglechange + tilt)
-		//EMWaitUntilReady()
+		EMSetStageAlpha(anglechange + tilt)
+		EMWaitUntilReady()
 	}
 	
 	void Shift(object self)
 	{
-		number newX,newY,newZ, newDefocus
+		number newX,newY,newZ
 		newX = DLGGetValue(self.lookupelement("nextX"))
 		newY = DLGGetValue(self.lookupelement("nextY"))
-		//newZ = DLGGetValue(self.lookupelement("nextZ"))
-		newDefocus = DLGGetvalue(self.lookupelement("nextDefocus")) * 1000
+		newZ = DLGGetValue(self.lookupelement("nextZ"))
 		
-		//Z-shift friendly
-		//EMSetStagePositions(7,newX,newY,newZ,0,0)  //Z shift version
+		EMSetStagePositions(3,newX,newY,newZ,0,0)
+		EMSetCalibratedfocus(newZ)
 		
-		//Non Z-shift
-		//EMSetStagePositions(3,newX,newY,0,0,0)
-		//EMSetCalibratedFocus(newDefocus)
-		
-		//Use necessary absolute EM commands  
-		//EMWaitUntilReady()
+		EMWaitUntilReady()
 	}
 	
 	void acquire(object self)
@@ -315,18 +305,19 @@ class MainMenu : uiframe
 		number file = OpenFileForWriting(fullpath)
 		
 		
-		//EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
+		EMGetStagePositions(27,imagex,imagey,imagez,alpha,beta)
+		imagez = EMGetCalibratedFocus()/1000
 		WriteFile(file,alpha+","+imagex+","+imagey+","+imagez+","+beta+"\n") 
 		
-		//DSInvokeButton(1)
+		DSInvokeButton(1)
 		
 		//Add Refresh code, DLGValue w/ read in terms
 		//Reset Current Values
-		//EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
+		EMGetStagePositions(27,imagex,imagey,imagez,alpha,beta)
+		imageZ = EMGetCalibratedFocus()
 		dlgvalue(self.lookupelement("currX"), imagex)
 		dlgvalue(self.lookupelement("currY"), imagey)
-		//dlgvalue(self.lookupelement("currZ"), imagez)
-		dlgvalue(self.lookupelement("currDefocus"), imagez)
+		dlgvalue(self.lookupelement("currZ"), imagez)
 		dlgValue(self.lookupelement("currenttiltfield"), alpha)
 		
 		//Next Values, not sure if this works or not
@@ -336,11 +327,9 @@ class MainMenu : uiframe
 		//result("\n"+ (A * cos(B*nextAngle + C)))
 		dlgvalue(self.lookupelement("nextX"), imageX)
 		dlgvalue(self.lookupelement("nextY"), A * cos(B*nextAngle + C))
-		//dlgValue(self.lookupelement("nextZ"), A * sin(B*nextAngle + C))
-		dlgValue(self.lookupelement("nextDefocus"), A * sin(B*nextAngle + C))
+		dlgValue(self.lookupelement("nextZ"), A * sin(B*nextAngle + C))
 		
-		
-		//EMWaitUntilReady()
+		EMWaitUntilReady()
 	}
 	
 }
