@@ -13,15 +13,57 @@ number deltaTilt = 1
 number CurrentTilt = 0
 number A, B, C   //To be used for y = Acos(B*theta + C)
 
+
+void Correlation(image &img1, image &img2, number &x, number &y) //Borrowed from Jonathan Schwartz 
+{   
+    // STEP 1: Ensure image are of same size, else pad (with zeros).
+    number sx1, sy1, sx2, sy2
+    GetSize( img1, sx1, sy1 )
+    GetSize( img2, sx2, sy2 )
+    Number mx = max( sx1, sx2 )
+    Number my = max( sy1, sy2 )
+    Number cx = trunc(mx/2)
+    Number cy = trunc(my/2)
+    image src := Realimage( "Source", 4, mx, my )       //Realimage(title, size, width, height)
+    image ref := Realimage( "Reference", 4, mx, my )
+    src[ 0, 0, sy1, sx1 ] = img1
+    ref[ 0, 0, sy2, sx2 ] = img2
+    
+    // STEP 2: Cross-Correlate images and find maximum correlation
+    image CC := CrossCorrelate( src, ref )
+    String Name = "Correlation"
+    SetName(CC, Name)
+    ShowImage(CC)                               //Show the cross correlation. 
+    number mpX, mpY
+    max( CC, mpX, mpY )                         //Position of max pixel is at (mpX, mpY)
+    number sX = cx - mpX 
+    number sY = cy - mpY 
+
+    Result( "Relative image shift: (" + sX + ", " + sY + ") pixels \n" )
+
+    //Return the current STEM field-of-view (FOV) in calibrated units according to the stored calibration.
+    number scaleX = img2.imageGetDimensionScale(0)  // Returns the scale of the given dimension of image.  
+    number scaleY = img2.imageGetDimensionScale(1)   
+    x = sX*scaleX
+    y = sY*scaleY   
+
+    Result("Relative image shift: (" + x + ", " + y + ") Microns \n" ) 
+
+}
+
 TagGroup CalibDialog()
 {
 	TagGroup Cal_items = newTagGroup()
 	TagGroup Cal_box = DLGCreateBox("Calibration",Cal_items)
-	TagGroup coordinateButton = DLGCreatePushButton("Acquire Coordinates", "Coordinate")
-	
+
+	TagGroup thetaTiltButton = DLGCreatePushButton("Find Tilt Angle Offset", "TiltOffset")
+	TagGroup thetaOffsetField = DLGCreateRealField(0,4,4).DLGidentifier("tiltoffsetfield")
+	TagGroup theta_region = DLGGroupitems(thetaTiltButton, thetaOffsetField).dlgtablelayout(1,2,1)
+	TagGroup coordinateButton = DLGCreatePushButton("Acquire Coordinates", "Coordinate")	
 	TagGroup ExportButton = DLGCreatePushButton("Export Coordinates", "Export").dlgexternalpadding(10,10)
 	
-	Cal_items.DLGAddElement(DLGgroupitems(coordinateButton, ExportButton).DLGtablelayout(2,1,0))
+	
+	Cal_items.DLGAddElement(DLGgroupitems(theta_region,coordinateButton, ExportButton).DLGtablelayout(3,1,0))
 	return Cal_box
 }
 	
@@ -35,7 +77,7 @@ TagGroup TomoDialog()
 	TagGroup TiltRange_Label = DLGCreateLabel("Tilt Range: ")
 	TagGroup LowerBoundfield = DLGCreateRealField(-25,4,2).DLGidentifier("LowerBoundfield")
 	TagGroup UpperBoundfield = DLGCreateRealField(25,4,2).DLGidentifier("UpperBoundfield")
-	TagGroup TiltRange_region = DLGgroupitems(TiltRangE_Label,LowerBoundField,UpperBoundField).DLGtablelayout(3,1,0)
+	TagGroup TiltRange_region = DLGgroupitems(TiltRange_Label,LowerBoundField,UpperBoundField).DLGtablelayout(3,1,0)
 	
 	TagGroup Load_items = newTagGroup()
 	TagGroup Load_box = DLGCreateBox("Use ONCE", Load_items) 
@@ -131,6 +173,36 @@ class MainMenu : uiframe
 	
 	
 	//Calibration Buttons
+	void TiltOffset(object self)
+	{
+		number xshift, yshift, theta_offset
+		image img1,img2
+		captureFunction(self)
+		if (!getfrontimage(img1))
+		{
+			okdialog("No Image found!")
+			return
+		}
+		img1 := getfrontimage()
+		
+		EMSetStageAlpha(EMGetStageAlpha()+5)  //Tilts slightly
+		captureFunction(self)
+		if (!getfrontimage(img2))
+		{
+			okdialog("No Image found!")
+			return
+		}
+		img2 := getfrontimage()
+		
+		Correlation(img1,img2,xshift,yshift)
+		if (xshift==yshift)
+		{
+			okdialog("Same image used, or no tilt occurred. \nCheck for errors!")
+			return
+		}
+		theta_offset = atan(xshift/yshift)  //Assumption: X-axis is ideal tilt axis, so Y direction is ideally only shift.
+		dlgvalue(self.lookupelement("tiltoffsetfield"),theta_offset)
+	}
 	void coordinate(object self)
 	{
 		result("Acquired!\n")
@@ -152,7 +224,7 @@ class MainMenu : uiframe
 		CloseFile(file)
 	}
 	
-	//Tomography Buttons
+	Tomography Buttons
 	void Load(object self)
 	{
 		string directory
@@ -227,7 +299,7 @@ class MainMenu : uiframe
 		DLGgetValue(self.lookupelement("SavePathField"),directory)
 		string fullpath = directory + export_file_name
 		number file = OpenFileForWriting(fullpath)
-		object myStream = newstreamfromfilerefrence(file)
+		
 		
 		EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
 		WriteFile(file,alpha+","+imagex+","+imagey+","+imagez+","+beta+"\n") 
