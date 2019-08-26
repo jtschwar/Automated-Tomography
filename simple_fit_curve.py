@@ -46,27 +46,21 @@ def fit_curve():
     alpha_coord = coord[:,3]
 
     # # Curve Fitting
-    defocus_params, _ = optimize.curve_fit(fit_defocus, alpha_coord, z_coord, p0=(alpha_coord[-1], z_coord[-1]))
-    n0 = defocus_params[0]*10**3 
-    print('n0: ' + str(n0) + '[nm]  df0: ' + str(df0))
-    df0 = defocus_params[1]*10**3
+    lin_params, _ = optimize.curve_fit(fit_lin, alpha_coord, x_coord)
+    cos_params, _ = optimize.curve_fit(fit_cos, alpha_coord, y_coord)
+    np.savetxt('model_fit.txt', cos_params) #Save parameters
 
-    x_params, _ = optimize.curve_fit(fit_x, alpha_coord, x_coord, bounds=(0,[n0*2, df0*2, np.pi/30]))
-    y_params, _ = optimize.curve_fit(fit_y, alpha_coord, y_coord, bounds=(0,[n0*2, df0*2, np.pi/30]))
-    print('Parameter order: 1. n0, 2. df0, 3. theta')
-    print(x_params)
-    print(y_params)
-
-    df_form = r'$dF = n0sin(\theta) + df0cos(\theta)$'
-    x_form = r'$X = n0cos(\theta)cos(\alpha) - df0sin(\theta)cos(\alpha)$'
-    y_form = r'$Y = n0sin(\theta)sin(\alpha) - df0cos(\theta)sin(\alpha)$'
+    lin_form = 'X = ' + str(round(lin_params[0],3)) + r'$\theta + $' \
+                + str(round(lin_params[1],3))
+    cos_form = 'Y = ' + str(round(cos_params[0],3)) + r'$\cos($' + \
+                str(round(cos_params[1],3)) + r'$\theta + $' + \
+                str(round(cos_params[2],3)) + ')'
 
     # #Plot Fitted Model
-    fig, (ax1, ax2, ax3) = plt.subplots(3,1, figsize=(6,6))
+    fig, (ax1, ax2) = plt.subplots(2,1, figsize=(6,6))
     fig.subplots_adjust(hspace=0.1,left=0.15)
-    x = np.linspace(-90, 90)
 
-    #Plot X - Coordinate
+    x = np.linspace(-90, 90)
     ax1.scatter(alpha_coord, x_coord, label='Data')
     ax1.plot(x,fit_lin(x, lin_params[0], lin_params[1]), color='r', label='Fitted Function')
     ax1.set_ylabel('X-Coordinate (Microns)',fontweight='bold', fontsize=11)
@@ -86,24 +80,11 @@ def fit_curve():
     plt.close(fig)
 
 #Functional Form
-def fit_defocus(x,a,b):
-    # a is the original offset between tilt and optical axis
-    # b is the defocus at starting tilt (theta = 0)
-	return a*np.sin(x*np.pi/180) + b*np.cos(x*np.pi/180)
+def fit_cos(x,a,b,c):
+	return a*np.cos(b*x*np.pi/180+c)
 
-def fit_x(x,a,b,c):
-    # a is the original offset between tilt and optical axis
-    # b is the defocus at starting tilt (theta = 0)
-    # c is the tilt axis misalignment
-    return (a*np.cos(x*np.pi/180) - b*np.sin(x*np.pi/180))*np.cos(c)
-
-def fit_y(x,a,b):
-    # a is the original offset between tilt and optical axis
-    # b is the defocus at starting tilt (theta = 0)
-    # c is the tilt axis misalignment
-    return (a*np.sin(x*np.pi/180) - b*np.cos(x*np.pi/180))*np.sin(c)
-
-
+def fit_lin(x,a,b):
+    return a*x+b
 
 ### Main loop #####
 while True:
