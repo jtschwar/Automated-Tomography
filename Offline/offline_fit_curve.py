@@ -1,20 +1,8 @@
 from matplotlib import pyplot as plt
+import uncertainties.unumpy as unp
+import uncertainties as unc
 from scipy import optimize
 import numpy as np
-
-#Uncommon library to have, will make sure ya got it downloaded!
-try:
-    import uncertainties.unumpy as unp
-    import uncertainties as unc
-except:
-    try:
-        from pip import main as pipmain
-    except:
-        from pip._internal import main as pipmain
-    pipmain(['install','uncertainties'])
-    import uncertainties.unumpy as unp
-    import uncertainties as unc
-
 
 
 #Theta(Degrees), Y-Coordinate(Micron)
@@ -74,6 +62,5 @@ ax2.set_xlabel('Tilt Angle (Degrees)',fontweight='bold', fontsize=11)
 ax2.set_ylabel('Y-Coordinate (Microns)',fontweight='bold', fontsize=11)
 ax2.set_title(cos_form,loc='left',fontsize=10)
 ax2.fill_between(x, nom_cos - 1.96 * std_cos, nom_cos + 1.96*std_cos, color ="black", alpha=.15)
-ax2.fill_between
 plt.tight_layout()
 plt.show() 
