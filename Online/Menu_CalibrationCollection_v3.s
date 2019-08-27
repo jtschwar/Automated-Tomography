@@ -187,6 +187,7 @@ class MainMenu : uiframe
 		img1 := getfrontimage()
 		
 		EMSetStageAlpha(EMGetStageAlpha()+5)  //Tilts slightly
+		EMWait
 		captureFunction(self)
 		if (!getfrontimage(img2))
 		{
