@@ -107,6 +107,6 @@ void captureFunction(object given)
 		//stack[0,0,i,cDim,CDim,i+1]=curr
 		//DeleteImage(curr)
 	}
-	result("Capture Complete!")
+	result("Capture Complete!\n")
 }
 

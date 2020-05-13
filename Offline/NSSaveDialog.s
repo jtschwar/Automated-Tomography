@@ -132,26 +132,27 @@ void SetPathFunction(object given)
     }
 
 //EFFECTS: Save as a Gatan type file the front most image in given SavePathDirection with Name
+//NOTES  : Pay Close attention to Dialog names in the future
+//		     as program will crash randomly if no matches found
 void SaveFunction(object given, number fieldNo)
     {
-        String save_path = "";
+
+        String save_path = ""
         dlggetvalue(given.lookupelement("SavePathField"), save_path);
         if(save_path == "[NO PATH]")
         {
-            okdialog("Must select path before imaging");
+            okdialog("Must select path before imaging")
             return;
         }
-
-        String save_string = "";
+        String save_string = ""
         dlggetvalue(given.lookupelement("SaveStringField"),save_string);
         save_string = " "+save_string
-        //result(""+FindNextKeyName(self, "asdf%m%sdf","%"))
-        //result(FindNextKeyName(self,"asdf%r%",0));
         number pos = 0;
-        String substituted_string = "$";
+        String substituted_string = "$"
+
         while(pos < len(save_string))
         {
-            //result(findnextkeyname(  self, save_string, pos ));
+            result(findnextkeyname(save_string, pos ))
             number oldPos = pos;
             String next_key = findnextkeyname( save_string, pos );
             String added = "";
@@ -262,8 +263,8 @@ TagGroup MakeSaveDialog()
         SaveTable.dlgtablelayout(2,1,0)
         
         TagGroup SaveStringLabel = DLGCreateLabel("Save String:")
-        TagGroup SaveStringField = DLGCreateStringField("%T%_%V%kV_%M%X_%L%cm_",80).dlgidentifier("SaveStringField1");
-        TagGroup SaveButton = DLGCreatePushButton("Save Front Image","Save1")
+        TagGroup SaveStringField = DLGCreateStringField("%T%_%V%kV_%M%X_%L%cm_",80).dlgidentifier("SaveStringField");
+        TagGroup SaveButton = DLGCreatePushButton("Save Front Image","SaveFunction")
         
         TagGroup SaveStringTable = DLGGroupItems(SaveStringLabel, SaveStringField, SaveButton)
         SaveStringTable.DLGTableLayout(3,1,0)

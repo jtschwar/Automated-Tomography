@@ -18,7 +18,7 @@ number tiltComplete = 0 //0 false, 1 true
 //REQUIRES: Two Images
 //MODIFIES: x and y, the reference values
 //EFFECTS : By performing CC, we see how an images change with rotation
-//			Thus, we can see if the rotation axis is at all tilted from being strictly <1 0 0>
+//			Thus, we can see if the rotation axis is 	 at all tilted from being strictly <1 0 0>
 //NOTE    :  z |
 //			   |_ _ _ y
 //			  /
@@ -389,19 +389,21 @@ class MainMenu : uiframe
 		}
 		captureFunction(self)
 		saveFunction(self,1)
-		
+		result("ACQUIRE DEBUG ZONE: -1\n")
 		string directory
 		DLGgetValue(self.lookupelement("SavePathField"),directory)
+		result("ACQUIRE DEBUG ZONE: 0\n")
 		string fullpath = directory + export_file_name
+		result(fullpath)
 		number file = OpenFileForWriting(fullpath)
-		
 		
 		//EMGetStagePositions(27,imagex,imagey,imagez,alpha,beta)
 		//imagez = EMGetCalibratedFocus()/1000
-		WriteFile(file,alpha+","+imagex+","+imagey+","+imagez+","+beta+"\n") 
-		
+		output = output + alpha+","+imagex+","+imagey+","+imagez+","+beta+"\n"
+		WriteFile(file,output) 
+		result("File updated\n")
+		CloseFile(file)
 		//DSInvokeButton(1)
-		
 		//Add Refresh code, DLGValue w/ read in terms
 		//Reset Current Values
 		//EMGetStagePositions(27,imagex,imagey,imagez,alpha,beta)
@@ -410,7 +412,6 @@ class MainMenu : uiframe
 		dlgvalue(self.lookupelement("currY"), imagey)
 		dlgvalue(self.lookupelement("currZ"), imagez)
 		dlgValue(self.lookupelement("currenttiltfield"), alpha)
-		
 		//Next Values, not sure if this works or not
 		number nextAngle = (alpha + DLGGetValue(self.lookupelement("deltatiltfield")))*Pi()/180
 		//result("\n" + DLGGetValue(self.lookupelement("deltatiltfield")))
@@ -419,8 +420,8 @@ class MainMenu : uiframe
 		dlgvalue(self.lookupelement("nextX"), imageX)
 		dlgvalue(self.lookupelement("nextY"), A * cos(B*nextAngle + C))
 		dlgValue(self.lookupelement("nextZ"), A * sin(B*nextAngle + C))
-		
 		//EMWaitUntilReady()
+		tiltComplete = 0
 	}
 	
 	//------END Tomography Functions----//
