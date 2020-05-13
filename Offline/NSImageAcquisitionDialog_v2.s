@@ -9,12 +9,9 @@
 
 
 
-
-
-
-
 //MAIN FUNCTIONS
 
+//EFFECTS: Creates the Dialog box for Acquisition Box settings
 TagGroup MakeAcqDialog()
 {
 	TagGroup Acq_items = newTagGroup()
@@ -45,9 +42,12 @@ TagGroup MakeAcqDialog()
 	return Acq_box
 }
 
+//REQUIRES: Approrpiate Imaging Environment OR disabled EM functions
+//EFFECTS : Using Acquisition parameters, capture and save image stack to SavePath
+//NOTES   : Refer to NSSaveDialog for save functionality
 void captureFunction(object given)
 {
-	result("Function is working1 \n")
+	result("Beginning Capture Function... \n")
 	string savePath
 	DLGgetValue(given.lookupelement("SavePathField"), savepath)
 		if(savePath == "[NO PATH]")
@@ -55,30 +55,29 @@ void captureFunction(object given)
 			okdialog("Must select path before imaging")
 			return;
 		}
-	result("Function is working1 \n")
 	number detectChecks = 0
 	number signalIndex = 0
 	number dataDepth = 4
 	number acquire = 1
 	number imageID = 0
 	number cDim
-	result("Variables instantiated")
+	//result("Variables instantiated")
 	DLGGetValue(given.lookupelement("dimField"), cDim)
-	result("DLGGetValue used successfully")
+	//result("DLGGetValue used successfully")
 	number cDwellT 
 	DLGGetValue(given.lookupelement("dwellField"), cDwellT);
 	number cImageNum 
 	dlgGetValue(given.lookupelement("imageNumfield"), cImageNum)
 	number sRotation
 	dlgGetValue(given.lookupelement("rotationField"), sRotation)
-	result("Function is working1.5 \n")
+	
 	number ParamID = 1 //DSCreateParameters(cDim,cDim,sRotation,cDwellT,0)
 	
 	image stack = NewImage("stack",2,cDim,cDim,cImageNum)
 	
-	result("Function is working2 \n")
-	result(dlgGetValue(given.lookupelement("detect1_check")))
-	result(dlgGetValue(given.lookupelement("detect2_check")))
+	
+	//result(dlgGetValue(given.lookupelement("detect1_check")))
+	//result(dlgGetValue(given.lookupelement("detect2_check")))
 	if(dlgGetValue(given.lookupelement("detect1_check")))
 	{
 		detectChecks += 1
@@ -108,6 +107,6 @@ void captureFunction(object given)
 		//stack[0,0,i,cDim,CDim,i+1]=curr
 		//DeleteImage(curr)
 	}
-	
+	result("Capture Complete!")
 }
 

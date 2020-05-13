@@ -11,6 +11,8 @@
 
 
 //SUB FUNCTIONS
+//REQUIRES: Properly formatted string input
+//EFFECTS : Using % as a delimiter, look for next instance of naming variable (Ex) D, K, T, etc.
 string FindNextKeyName(string input, number & searchPos )
     {
         number totalLength = len( input )
@@ -32,7 +34,7 @@ string FindNextKeyName(string input, number & searchPos )
         return ""
 
     }
-
+//EFFECTS : Retrieves Year, month, day as known by the computer and returns it
 String getDate()
     {
         string dateTime = DateStamp()
@@ -71,6 +73,7 @@ String getDate()
         return year+month+day;
     }
     
+    //EFFECTS : Retrieves current time as known by computer  and returns it
 String getTime()
     {
         string dateTime = DateStamp()
@@ -114,6 +117,8 @@ String getTime()
 
 //MAIN FUNCTIONS: Not sure how "object self" will transfer 
 
+//MODIFIES: Savepath field
+//EFFECTS : Modifies SavePathField to be to chosen directory
 void SetPathFunction(object given)
     {
         String current_path;
@@ -126,6 +131,7 @@ void SetPathFunction(object given)
         }
     }
 
+//EFFECTS: Save as a Gatan type file the front most image in given SavePathDirection with Name
 void SaveFunction(object given, number fieldNo)
     {
         String save_path = "";
@@ -238,6 +244,7 @@ void SaveFunction(object given, number fieldNo)
         okdialog("Saved as: \n"+substituted_string+"\n")
     }
    
+   //EFFECTS: Make Save Path Dialog
 TagGroup MakeSaveDialog()
     {
         taggroup box1_items

@@ -9,11 +9,23 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Offline/offline_fit_curve.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
+            <state relative-caret-position="40">
+              <caret line="39" selection-start-line="39" selection-end-line="43" selection-end-column="28" />
+              <folding>
+                <element signature="e#0#36#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fit_curve.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-1419">
               <folding>
                 <element signature="e#0#36#0" expanded="true" />
               </folding>
@@ -29,7 +41,7 @@
   <component name="ProjectFrameBounds">
     <option name="x" value="860" />
     <option name="y" value="5" />
-    <option name="width" value="1109" />
+    <option name="width" value="1110" />
     <option name="height" value="1030" />
   </component>
   <component name="PropertiesComponent">
@@ -63,7 +75,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="688" y="4" width="887" height="824" extended-state="0" />
+    <frame x="688" y="4" width="888" height="824" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.25" />
@@ -86,9 +98,19 @@
     </layout>
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/fit_curve.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1419">
+          <folding>
+            <element signature="e#0#36#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Offline/offline_fit_curve.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
+        <state relative-caret-position="40">
+          <caret line="39" selection-start-line="39" selection-end-line="43" selection-end-column="28" />
           <folding>
             <element signature="e#0#36#0" expanded="true" />
           </folding>

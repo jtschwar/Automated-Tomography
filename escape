@@ -1,0 +1,227 @@
+[33mcommit 2314edf2a331e80ca5ce8163f7a1dfeefac976ec[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Jonathan Schwartz <jtschw@umich.edu>
+Date:   Tue Aug 27 13:02:51 2019 -0400
+
+    Remove extra line
+
+[33mcommit a27c0b0e8e255a39b32a5674d63abaa771dcbcf5[m
+Author: Staumrel <jepi@umich.edu>
+Date:   Tue Aug 27 10:34:20 2019 -0400
+
+    Added confidence interval code
+
+[33mcommit 6562acb7dffaf4f609ec94efe0419d7d6b3934eb[m
+Merge: 185828e efcb200
+Author: jtschw@umich.edu <jtschw@umich.edu>
+Date:   Mon Aug 26 15:57:57 2019 -0400
+
+    Merge branch 'master' of https://github.com/jtschwar/Automated-Tomography
+
+[33mcommit 185828edcad94a440cbd3af7ea3a0be723a55ed0[m
+Author: jtschw@umich.edu <jtschw@umich.edu>
+Date:   Mon Aug 26 15:57:12 2019 -0400
+
+    Updates to curve fitting scripts.
+
+[33mcommit efcb2009c3834460e6e7a3824d08b5d799018279[m
+Author: Staumrel <jepi@umich.edu>
+Date:   Sat Aug 24 18:23:19 2019 -0400
+
+    Small update to v3; defocus' calibrated units are nanometers, so had to adjust for that
+
+[33mcommit b502dd66854a375436d87e7bfbacef9fe3edf44f[m
+Author: Staumrel <jepi@umich.edu>
+Date:   Sat Aug 24 18:06:47 2019 -0400
+
+    Updated so that v2 is stageZ while v3 is defocus
+
+[33mcommit e0059e86b98606d99deacc60f19a665f8ffe0f90[m
+Author: Staumrel <jepi@umich.edu>
+Date:   Thu Aug 22 15:26:13 2019 -0400
+
+    Updated to use Cross Correlation to find theta.  v3 utilizes defocus instead of stageZ, but may be necessary to reevaluate the code
+
+[33mcommit b67bad441c97d3f0e9bccbf90e47c4567329ac5c[m
+Author: Jonathan Schwartz <jtschw@umich.edu>
+Date:   Mon Aug 19 19:17:41 2019 -0400
+
+    Add second plot for X coordinate
+
+[33mcommit f5160902c278591ebfc0e9834da8a820ee5cda8b[m
+Author: Jonathan Schwartz <jtschw@umich.edu>
+Date:   Mon Aug 19 19:17:14 2019 -0400
+
+    Add second plot for X coordinate fit.
+
+[33mcommit 05ef606969a5414294ac86d82f49b500fec04d77[m
+Merge: cf1f202 2666903
+Author: Staumrel <jepi@umich.edu>
+Date:   Sun Aug 18 14:14:13 2019 -0400
+
+    Merge branch 'master' of https://github.com/jtschwar/Automated-Tomography
+
+[33mcommit cf1f20279bd5840e43a4a9a1a1ccf9a208b2a763[m
+Author: Staumrel <jepi@umich.edu>
+Date:   Sun Aug 18 14:13:41 2019 -0400
+
+    Added coordinate updates, also updated aesthetics of number width
+
+[33mcommit 3d5da5c832d21a41d1b0756a1ab4883577f99b6d[m
+Author: Staumrel <jepi@umich.edu>
+Date:   Sun Aug 18 14:11:54 2019 -0400
+
+    Added coordinate updates, also updated aesthetics of number width
+
+[33mcommit 26669038dbcd8cb3f6dea25fd5c1e82f5ad05cfb[m
+Merge: 72ea00a 9701e9b
+Author: Jonathan Schwartz <jtschw@umich.edu>
+Date:   Sun Aug 18 13:58:34 2019 -0400
+
+    Merge branch 'master' of https://github.com/jtschwar/Automated-Tomography
+
+[33mcommit 72ea00a4fd56f3e3428deb52b85414dd662f5c04[m
+Author: Jonathan Schwartz <jtschw@umich.edu>
+Date:   Sun Aug 18 13:57:58 2019 -0400
+
+    Local curve fit
+
+[33mcommit 9701e9baa888b260d25dc5169527234cb43de4e7[m
+Author: Staumrel <jepi@umich.edu>
+Date:   Sun Aug 18 13:00:57 2019 -0400
+
+    Made the menu modal, so it and other menus can be moved during use.  Made small changes to save and Image Acquisiton files for more response to user
+
+[33mcommit baf4717e1e2996e17d64f3e6703acf60a3017712[m
+Author: Staumrel <jepi@umich.edu>
+Date:   Mon Aug 12 11:32:35 2019 -0400
+
+    Added changes to NSSaveDialog to make it online, updated field names to avoid broken reading. Should probably save on the microscope now!
+
+[33mcommit 8b353fe414630f411ebf9f072b608157ad7b94a6[m
+Author: Jonathan Schwartz <jtschw@umich.edu>
+Date:   Sat Aug 10 21:40:48 2019 -0700
+
+    Allow python to monitor server.
+
+[33mcommit 1bd037463d05bbc771469a98fef1933cf0eff5d4[m
+Author: Jonathan Schwartz <jtschw@umich.edu>
+Date:   Sat Aug 3 19:58:40 2019 -0400
+
+    Changes from Saturday's test.
+
+[33mcommit 320ff8883013ad68a766acdc832861fa2a7e00ef[m
+Author: Staumrel <jepi@umich.edu>
+Date:   Fri Aug 2 14:01:38 2019 -0400
+
+    Updated to allow detector selection.  Additionally, fixed field bug that would prevent captureFunction from returning.
+
+[33mcommit 982362f1e51400598ae6a6d9936f95be912f6985[m
+Author: Staumrel <jepi@umich.edu>
+Date:   Thu Aug 1 14:20:39 2019 -0400
+
+    Created Offline and Online folders, removed comments from EM Functions in Online
+
+[33mcommit ed582e73d37a79c8dbfb190c187bfb130a5e3249[m
+Author: Hovden Group <jtschw@umich.edu>
+Date:   Tue Jul 30 17:46:51 2019 -0400
+
+    Remove test script.
+
+[33mcommit 3609c16f904698f4058652ef3b1390fc8efaad4c[m
+Author: Jacob Pietryga <jepi@umich.edu>
+Date:   Tue Jul 30 12:51:05 2019 -0400
+
+    Yikes
+
+[33mcommit 35fc54c6a9fd5b917363ddf57a6e1c1e751c4aa6[m
+Author: Staumrel <jepi@umich.edu>
+Date:   Tue Jul 30 12:07:04 2019 -0400
+
+    Add files via upload
+
+[33mcommit 3e8cdeaaf78bfb6b9cb5e913bd66b0704ab39fe7[m
+Author: Staumrel <jepi@umich.edu>
+Date:   Fri Jul 26 15:58:05 2019 -0400
+
+    Add files via upload
+
+[33mcommit 47620f056caf41a4dfc9412357ea14f4e0a59acf[m
+Author: Hovden Group <jtschw@umich.edu>
+Date:   Thu Jul 25 21:14:08 2019 -0400
+
+    I/O to emal server for fit curve.
+
+[33mcommit 0c14e7c27536e2ea25453952970e2dc42e17d1c9[m
+Author: Hovden Group <jtschw@umich.edu>
+Date:   Thu Jul 25 20:57:43 2019 -0400
+
+    I/O to server with python.
+
+[33mcommit 7f804ef38c83a18cda6ea6c069a65a89c6ede6ee[m
+Author: Hovden Group <jtschw@umich.edu>
+Date:   Thu Jul 25 11:56:41 2019 -0400
+
+    Small fix.
+
+[33mcommit 6a092a8c7ec0e3299949b691c23c35866b19d540[m
+Author: Hovden Group <jtschw@umich.edu>
+Date:   Thu Jul 25 11:50:24 2019 -0400
+
+    Add example text files for model fit.
+
+[33mcommit dc65904217815ae80399e2c9e3a84bd5557caddf[m
+Author: Hovden Group <jtschw@umich.edu>
+Date:   Thu Jul 25 11:37:22 2019 -0400
+
+    Adapt fit curve for exports from DM.
+
+[33mcommit df4cdde5edfa822252ec9fe844b0dd1ef95be664[m
+Author: Jonathan Schwartz <jtschw@umich.edu>
+Date:   Mon Jul 22 17:33:48 2019 -0400
+
+    Add python fit curve
+
+[33mcommit c75ad7e1bae0d2f26eec79da9478c7e6225e32eb[m
+Author: Staumrel <jepi@umich.edu>
+Date:   Mon Jul 22 17:32:16 2019 -0400
+
+    Add files via upload
+
+[33mcommit 7fb12e72ae7e1af820366878e3d4daa0bd33ed81[m
+Author: jtschwar <32110921+jtschwar@users.noreply.github.com>
+Date:   Mon Jul 22 15:20:42 2019 -0400
+
+    Update README.md
+
+[33mcommit a8b77b13e1190fbdfe63493c56a0d63d607dc483[m
+Author: Jonathan Schwartz <jtschw@umich.edu>
+Date:   Mon Jul 22 15:19:27 2019 -0400
+
+    Move old scripts to drafts
+
+[33mcommit d04a771cf03833d4e9164831873c35a8dee3e0f8[m
+Merge: d4f4965 ef24849
+Author: jtschwar <32110921+jtschwar@users.noreply.github.com>
+Date:   Mon Feb 5 12:50:00 2018 -0500
+
+    Merge pull request #1 from jtschwar/FirstTest
+    
+    Second Test for 20180201 on Jeol 3100
+
+[33mcommit ef24849925ad5ce112a0a3e7679598c58c200806[m[33m ([m[1;31morigin/FirstTest[m[33m)[m
+Author: Jonathan Schwartz <jtschw@umich.edu>
+Date:   Thu Feb 1 12:02:56 2018 -0500
+
+    Second Test for 20180201 on Jeol 3100
+
+[33mcommit d4f4965e3a79a1df8941edb740d2d90f0bcb3c06[m
+Author: Jonathan Schwartz <jtschw@umich.edu>
+Date:   Wed Jan 31 17:05:40 2018 -0500
+
+    First commit
+
+[33mcommit 88d63dbdf295bbe65e8b9e55b57f7556ee88804e[m
+Author: Jonathan Schwartz <jtschw@umich.edu>
+Date:   Wed Jan 31 17:01:53 2018 -0500
+
+    first commit

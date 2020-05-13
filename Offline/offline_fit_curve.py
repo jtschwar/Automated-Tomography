@@ -6,7 +6,7 @@ import numpy as np
 
 
 #Theta(Degrees), Y-Coordinate(Micron)
-coord = np.loadtxt('Coordinate.txt', delimiter=',', usecols=range(4))
+coord = np.loadtxt('Coordinate.txt', delimiter=',', usecols=range(5))
 alpha_coord = coord[:,0] 
 x_coord = coord[:,1]
 y_coord = coord[:,2]
@@ -17,6 +17,7 @@ def fit_cos(x,a,b,c):
 
 def fit_lin(x,a,b):
     return a*x+b
+
 
 # Curve Fitting
 lin_params, lin_covar = optimize.curve_fit(fit_lin, alpha_coord, x_coord)
