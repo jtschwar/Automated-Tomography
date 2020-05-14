@@ -1,114 +1,93 @@
 from matplotlib import pyplot as plt
 from scipy import optimize
-import numpy as np 
-import pysftp
+import numpy as np
 import time
 import os
 
-#Tomography Directory.  
-tomo_path = 'Jonathan Schwartz/server'
-
-#Information to log into server. 
-myHostname = 'emalserver.engin.umich.edu'
-myUsername = 'emal'
-myPassword = 'emalemal'
-hovden_lab_path = '/Volumes/Old EMAL Server Data/NewEMALServer2/JEOL 3100R05/Users/Hovden_Lab/'
+# Pathing/Listening Information
 local_path = os.getcwd()
-remote_path = hovden_lab_path + tomo_path
+myFile = 'Coordinate.txt'
+fullpath = os.path.join(local_path, myFile)
+myOutput = 'model_fit.txt'
+outputPath = os.path.join(local_path, myOutput)
+oldTime = 0
 
-# Download coordinates.txt file from server.
-sftp = pysftp.Connection(host=myHostname, username=myUsername, password=myPassword)
-sftp.cwd(remote_path)
 
 def check_coord():
 
-    #Check if Coordinates has been updates. 
-    for f in sftp.listdir_attr():
+    # Check for Updates
+    for file in os.listdir():
 
-        if (f.filename == 'coordinates.txt'):
-            if ((not os.path.isfile(f.filename)) or
-                (f.st_mtime > os.path.getmtime(f.filename))):
-
-                print("Downloading %s..." % f.filename)
-                sftp.get(f.filename, f.filename)
-
+        if(file == myFile):
+            fileOBJ = os.stat(fullpath)
+            newTime = fileOBJ.st_mtime
+            global oldTime
+            if(newTime != oldTime):
+                print("Modifications Detected; remodel...")
                 fit_curve()
-                sftp.put('model_fit.txt', 'model_fit.txt')
+                oldTime = newTime
 
 
 def fit_curve():
-
-    #Coordinates are saved as (alpha,x,y,z,beta) => (microns, degrees)
-    coord = np.loadtxt('coordinates.txt', delimiter=',', usecols=range(5))
-    alpha_coord = coord[:,0]
-    x_coord = coord[:,1]
-    y_coord = coord[:,2]
-    z_coord = coord[:,3]
-    
+    # Coordinates are saved as (alpha,x,y,z,beta) => (microns, degrees)
+    coord = np.loadtxt(fullpath, delimiter=',', usecols=range(5))
+    alpha_coord = coord[:, 0]
+    x_coord = coord[:, 1]
+    y_coord = coord[:, 2]
+    z_coord = coord[:, 3]
 
     # # Curve Fitting
-    defocus_params, _ = optimize.curve_fit(fit_defocus, alpha_coord, z_coord, p0=(alpha_coord[-1], z_coord[-1]))
-    n0 = defocus_params[0]*10**3 
-    print('n0: ' + str(n0) + '[nm]  df0: ' + str(df0))
-    df0 = defocus_params[1]*10**3
-
-    x_params, _ = optimize.curve_fit(fit_x, alpha_coord, x_coord, bounds=(0,[n0*2, df0*2, np.pi/30]))
-    y_params, _ = optimize.curve_fit(fit_y, alpha_coord, y_coord, bounds=(0,[n0*2, df0*2, np.pi/30]))
-    print('Parameter order: 1. n0, 2. df0, 3. theta')
-    print(x_params)
-    print(y_params)
-
-    df_form = r'$dF = n0sin(\theta) + df0cos(\theta)$'
-    x_form = r'$X = n0cos(\theta)cos(\alpha) - df0sin(\theta)cos(\alpha)$'
-    y_form = r'$Y = n0sin(\theta)sin(\alpha) - df0cos(\theta)sin(\alpha)$'
+    x_params, x_covar = optimize.curve_fit(fit_lin, alpha_coord, x_coord)
+    y_params, y_covar = optimize.curve_fit(fit_lin, alpha_coord, y_coord)
+    z_params, z_covar = optimize.curve_fit(fit_lin, alpha_coord, z_coord)
 
     # #Plot Fitted Model
-    fig, (ax1, ax2, ax3) = plt.subplots(3,1, figsize=(6,6))
-    fig.subplots_adjust(hspace=0.1,left=0.15)
+    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(6, 6))
+    fig.subplots_adjust(hspace=0.1, left=0.15)
     x = np.linspace(-90, 90)
-
-    #Plot X - Coordinate
-    ax1.scatter(alpha_coord, x_coord, label='Data')
-    ax1.plot(x,fit_lin(x, lin_params[0], lin_params[1]), color='r', label='Fitted Function')
-    ax1.set_ylabel('X-Coordinate (Microns)',fontweight='bold', fontsize=11)
-    ax1.set_xticklabels([])
-    ax1.set_title(lin_form,loc='left',fontsize=10)
-    ax1.legend()
-
-    #Plot Data Points. 
-    ax2.scatter(alpha_coord, y_coord, label='Data')
-    ax2.plot(x, fit_cos(x, cos_params[0], cos_params[1], cos_params[2]), color='r', label='Fitted Function')
-    ax2.set_xlabel('Tilt Angle (Degrees)',fontweight='bold', fontsize=11)
-    ax2.set_ylabel('Y-Coordinate (Microns)',fontweight='bold', fontsize=11)
-    ax2.set_title(cos_form,loc='left',fontsize=10)
-
-    plt.tight_layout()
-    plt.pause(5)
-    plt.close(fig)
-
-#Functional Form
-def fit_defocus(x,a,b):
-    # a is the original offset between tilt and optical axis
-    # b is the defocus at starting tilt (theta = 0)
-	return a*np.sin(x*np.pi/180) + b*np.cos(x*np.pi/180)
-
-def fit_x(x,a,b,c):
-    # a is the original offset between tilt and optical axis
-    # b is the defocus at starting tilt (theta = 0)
-    # c is the tilt axis misalignment
-    return (a*np.cos(x*np.pi/180) - b*np.sin(x*np.pi/180))*np.cos(c)
-
-def fit_y(x,a,b):
-    # a is the original offset between tilt and optical axis
-    # b is the defocus at starting tilt (theta = 0)
-    # c is the tilt axis misalignment
-    return (a*np.sin(x*np.pi/180) - b*np.cos(x*np.pi/180))*np.sin(c)
-
-
-
-### Main loop #####
-while True:
     
-    check_coord()    
-    time.sleep(5)
+    ax1.scatter(alpha_coord, x_coord,label='Data')
+    ax1.plot(x,fit_lin(x,x_params[0],x_params[1]),label='Fitted')
+    ax1.set_title('X Fitting')
+    ax1.legend()
+    
+    ax2.scatter(alpha_coord, y_coord,label='Data')
+    ax2.plot(x,fit_lin(x,y_params[0],y_params[1]),label='Fitted')
+    ax2.set_title('Y Fitting')
+    ax2.legend()
 
+    ax3.scatter(alpha_coord, z_coord,label='Data')
+    ax3.plot(x,fit_lin(x,z_params[0],z_params[1]),label='Fitted')
+    ax3.set_title('Z Fitting')
+    ax3.legend()
+    
+    plt.show()
+    
+    global f
+    try:
+        f = open(outputPath, 'w')
+    except FileNotFoundError:
+        f = open(outputPath, 'x')
+
+    
+    #np.savetxt(outputPath,(x_params, y_params, z_params),delimiter='\n')
+    #xString = np.array2string(x_params)
+    #yString = np.array2string(y_params)
+    #zString = np.array2string(z_params)
+    #f.write(xString)
+    #f.write(yString)
+    #f.write(zString)
+
+    f.close()
+
+
+def fit_lin(x, a, b):
+    return a*x+b
+
+#Time arbitrarily set right now, a break will be needed in actual use
+for i in range(10): 
+
+    check_coord()
+    time.sleep(5)
+    
+    
