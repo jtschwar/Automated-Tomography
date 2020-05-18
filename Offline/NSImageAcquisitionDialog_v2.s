@@ -5,7 +5,23 @@
 //By Jacob Pietryga 23 July 2019
 
 //SUB FUNCTIONS
-//none needed at the moment, perhaps in the future with additonal functionality
+//MODIFIES: 'Past' and 'Current' images
+//EFFECTS : Gets rid of old 'Past' and replaces it with 'Current'
+//			'Current' becomes the most recently found 'stack'
+//NOTES   : It is important to have saved the acquired images prior if they are desired
+void cycle_PastCurrent(){
+	image img1,img2,img3
+	img1 := FindImageByName("Past")
+	if(ImageIsValid(img1)){
+		deleteimage(img1)
+	}
+	img2 := FindImageByName("Current")
+	if(ImageisValid(img2)){
+		SetName(img2, "Past")
+	}
+	img3 := FindImageByName("stack")
+	SetName(img3,"Current")	
+}
 
 
 
@@ -74,6 +90,7 @@ void captureFunction(object given)
 	number ParamID = 1 //DSCreateParameters(cDim,cDim,sRotation,cDwellT,0)
 	
 	image stack = NewImage("stack",2,cDim,cDim,cImageNum)
+	setname(stack,"stack")
 	
 	
 	//result(dlgGetValue(given.lookupelement("detect1_check")))
@@ -107,6 +124,9 @@ void captureFunction(object given)
 		//stack[0,0,i,cDim,CDim,i+1]=curr
 		//DeleteImage(curr)
 	}
+	ShowImage(stack)
+	cycle_PastCurrent()
 	result("Capture Complete!\n")
 }
+
 

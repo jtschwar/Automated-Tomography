@@ -235,7 +235,7 @@ void SaveFunction(object given, number fieldNo)
             substituted_string = substituted_string + save_string.mid(oldPos,pos-oldPos-3)+added;
             //result(substituted_string+"\n")
         }
-
+		result("DEBUG ZONE: PREIMAGE")
         Image curr := getFrontImage();
 
 

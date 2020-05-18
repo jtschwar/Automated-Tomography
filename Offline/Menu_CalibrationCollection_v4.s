@@ -4,15 +4,16 @@
 //TO-DO:
 
 //Global Variables
-number imagex,imagey,imagez
+number imagex,imagey,imagez,df
 number alpha, beta
+number beamshiftX, beamshiftY
 string export_file_name = "Coordinate.txt"
 string file_name = "model_fit.txt"
 string output = "" //string that is shunted through Coordinate.txt
 number deltaTilt = 1
 number CurrentTilt = 0
 number A, B, C   //To be used for y = Acos(B*theta + C) in model prediction
-number xA,xB,xC,yA,yB,yC,zA,zB,zC
+number xA,xB,xC,yA,yB,yC,zA,zB,zC,dfA,dfB,dfC
 number tiltComplete = 0 //0 false, 1 true
 number setting = 0
 
@@ -72,9 +73,14 @@ TagGroup CalibDialog()
 	TagGroup Cal_items = newTagGroup()
 	TagGroup Cal_box = DLGCreateBox("Calibration",Cal_items)
 
-	TagGroup thetaTiltButton = DLGCreatePushButton("Find Tilt Angle Offset", "TiltOffset")
+	TagGroup CrossCorrButton = DLGCreatePushButton("CrossCorr. of Past/Current", "CrossCorrButton")
 	TagGroup thetaOffsetField = DLGCreateRealField(0,4,4).DLGidentifier("tiltoffsetfield")
-	TagGroup theta_region = DLGGroupitems(thetaTiltButton, thetaOffsetField).dlgtablelayout(1,2,1)
+	TagGroup xCorrField = DLGCreateRealField(0,4,4).DLGidentifier("xcorrfield")
+	TagGroup yCorrField = DLGCreateRealField(0,4,4).DLGidentifier("ycorrfield")
+	TagGroup xCorrLabel = DLGCreateLabel("X shift (pixels)")
+	TagGroup yCorrLabel = DLGCreateLabel("Y shift (pixels)")
+	TagGroup fieldAndLabels = DLGGroupitems(xCorrLabel,yCorrLabel,xCorrField,yCorrField).dlgtablelayout(2,2,1)
+	TagGroup theta_region = DLGGroupitems(CrossCorrButton, fieldAndLabels).dlgtablelayout(1,2,1)
 	TagGroup coordinateButton = DLGCreatePushButton("Acquire Coordinates", "Coordinate")	
 	TagGroup ExportButton = DLGCreatePushButton("Export Coordinates", "Export").dlgexternalpadding(10,10)
 	
@@ -133,24 +139,36 @@ TagGroup TomoDialog()
 	TagGroup XLabel = DLGCreateLabel("X")
 	TagGroup YLabel = DLGCreateLabel("Y")
 	TagGroup ZLabel = DLGCreateLabel("Z")
+	TagGroup DFLabel = DLGCreateLabel("Defocus")
+	
+	
+	TagGroup PastLabel = DLGCreateLabel("Past: ")
+	TagGroup PastX = DLGCreateRealField(0,9,5).dlgidentifier("pastX")
+	TagGroup PastY = DLGCreateRealField(0,9,5).dlgidentifier("pastY")
+	TagGroup PastZ = DLGCreateRealField(0,9,5).dlgidentifier("pastZ")
+	TagGroup PastDF = DLGCreateRealField(0,9,5).dlgidentifier("pastDF")
 	
 	TagGroup CurrLabel = DLGCreateLabel("Current: ")
 	TagGroup CurrX = DLGCreateRealField(0,9,5).dlgidentifier("currX")
 	TagGroup CurrY = DLGCreateRealField(0,9,5).dlgidentifier("currY")
 	TagGroup CurrZ = DLGCreateRealField(0,9,5).dlgidentifier("currZ")
+	TagGroup CurrDF = DLGCreateRealField(0,9,5).dlgidentifier("currDF")
 	//TagGroup CurrRow = DLGgroupitems(CurrLabel,CurrX,CurrY,CurrZ).DLGtablelayout(4,1,0)
 	
 	TagGroup NextLabel = DLGCreateLabel("Next: ")
 	TagGroup NextX = DLGCreateRealField(0,9,5).dlgidentifier("nextX")
 	TagGroup NextY = DLGCreateRealField(0,9,5).dlgidentifier("nextY")
 	TagGroup NextZ = DLGCreateRealField(0,9,5).dlgidentifier("nextZ")
+	TagGroup NextDF = DLGCreateRealField(0,9,5).dlgidentifier("nextDF")
 	//TagGroup NextRow = DLGGroupItems(NextLabel,NextX,NextY,NextZ).DLGTableLayout(4,1,0)
 	
-	TagGroup LeftestColumn = DLGGroupItems(EmptyLabel,CurrLabel,NextLabel).dlgTableLayout(1,3,1)
-	TagGroup MidLeftColumn = DLGGroupitems(XLabel,Currx,NextX).DLGTableLayout(1,3,1)
-	TagGroup MidRightColumn = DLGGroupitems(YLabel, CurrY,NextY).DLGTableLayout(1,3,1)
-	Taggroup RightestColumn = DLGGroupItems(ZLabel,CurrZ,NextZ).DLGTableLAyout(1,3,1)
-	TagGroup ShiftValueTable = DLGGroupItems(LeftestColumn,MidLeftColumn,MidRightColumn,RightestColumn).DLGTableLayout(4,1,0)
+	TagGroup LeftestColumn = DLGGroupItems(EmptyLabel,PastLabel,CurrLabel,NextLabel).dlgTableLayout(1,4,1)
+	TagGroup MidLeftColumn = DLGGroupitems(XLabel,PastX,CurrX,NextX).DLGTableLayout(1,4,1)
+	TagGroup MidColumn = DLGGroupitems(YLabel, PastY,CurrY,NextY).DLGTableLayout(1,4,1)
+	Taggroup MidRightColumn = DLGGroupItems(ZLabel,PastZ,CurrZ,NextZ).DLGTableLAyout(1,4,1)
+	TagGroup RightestColumn = DLGGroupItems(DFLabel,PastDF,CurrDF,NextDF).DLGTableLayout(1,4,1)
+	TagGroup ShiftValueTable = DLGGroupItems(MidLeftColumn,MidColumn,MidRightColumn,RightestColumn).DLGTableLayout(5,1,0)
+	TagGroup TotalTable = DLGGroupItems(LeftestColumn,ShiftValueTable).DLGTablelayout(2,1,0)
 	//TagGroup TotalTable = DLGGroupItems(EmptyLabel,XLabel,YLabel,ZLabel,CurrLabel,CurrX,CurrY,CurrZ,NextLabel,NextX,NextY,NextZ).DLGTableLayout(4,3,1)
 	//TagGroup ShiftColumn = DLGGroupItems(ShiftButton,TotalTable).DLGTableLayout(1,2,0)
 	
@@ -159,7 +177,7 @@ TagGroup TomoDialog()
 	TagGroup AcquireButton = DLGCreatePushButton("Acquire", "acquire")
 	
 	//Final Organization Defining
-	TagGroup value_region = DLGGroupItems(TiltOptions, ShiftValueTable).DLGTablelayout(2,1,0)
+	TagGroup value_region = DLGGroupItems(TiltOptions, TotalTable).DLGTablelayout(2,1,0)
 	TagGroup Procedure_column = DLGGroupItems(Load_box,Tiltbutton, ShiftButton,AcquireButton).dlgtablelayout(1,4,0)
 	tomo_items.DLGAddElement(DLGGroupitems(value_region, Procedure_column).dlgtablelayout(2,1,0))	
 	return tomo_box
@@ -224,53 +242,51 @@ class MainMenu : uiframe
 	
 	//------BEGIN Calibration Functions------------------//
 	
-	//REQUIRES: Imaging ready environment, Tilt Offset Button is pressed
-	//EFFECTS : Automatically take two pictures. From this, generate tilt offset information
-	//             that suggests how far microscope deviates from ideal rotation axis (x)
-	void TiltOffset(object self)
+	//REQUIRES: Imaging ready environment, Cross Corr Button is pressed
+	//EFFECTS : Automatically take "Past" and "Current" pictures. Cross Correlate the two
+	//			to the establish shift information
+	void CrossCorrButton(object self)
 	{
-		result("Getting tilt offset...\n")
+		result("Getting Cross Correlation...\n")
 		number xshift, yshift, theta_offset
 		image img1,img2
-		captureFunction(self)
-		if (!getfrontimage(img1))
+		//captureFunction(self)
+		img1 := FindImageByName( "Past" ) 
+		if (!ImageisValid(img1))
 		{
-			okdialog("No Image found!")
+			okdialog("No 'Past' Image found! ")
 			return
 		}
-		img1 := getfrontimage()
+		
 		
 		//EMSetStageAlpha(EMGetStageAlpha()+5)  //Tilts slightly
 		//EMWaitUntilReady()
-		captureFunction(self)
-		if (!getfrontimage(img2))
+		//captureFunction(self)
+		img2 := FindImageByName("Current")
+		if (!ImageIsValid(img2))
 		{
-			okdialog("No Image found!")
+			okdialog("No 'Current' Image found!")
 			return
 		}
-		img2 := getfrontimage()
 		
 		Correlation(img1,img2,xshift,yshift)
-		if (xshift==yshift)
-		{
-			okdialog("Same image used, or no tilt occurred. \nCheck for errors!")
-			return
-		}
-		theta_offset = atan(xshift/yshift)  //Assumption: X-axis is ideal tilt axis, so Y direction is ideally only shift.
-		dlgvalue(self.lookupelement("tiltoffsetfield"),theta_offset)
-		result("Tilt offset found!")
+		//Assumption: X-axis is ideal tilt axis, so Y direction is ideally only shift.
+		dlgvalue(self.lookupelement("xcorrfield"),xshift)
+		dlgvalue(self.lookupelement("ycorrfield"),yshift)
+		result("Cross Correlation Complete!\n")
 	}
 	
 	//REQUIRES: Appropriate Imaging environment
 	//MODIFIES: output
-	//EFFECTS : Acquire alpha, x, y, z, beta values and load it into a global variable "output"
+	//EFFECTS : Acquire x, y, z, alpha, beta, df, beamshiftX, beamshiftY values and load it into a global variable "output"
 	//NOTES   : "output" is the string that is shunted through Coordinate.txt
 	void coordinate(object self)
 	{
 		result("Acquiring...\n")
-		//EMGetStagePositions(27,imagex,imagey,imagez,alpha,beta)
-		//imagez = EMGetCalibratedFocus/1000
-		output = output +alpha+","+imagex+","+imagey+","+imagez+","+beta+"\n"
+		//EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
+		//df = EMGetCalibratedFocus/1000
+		//EMGetBeamShift(beamshiftx,beamshifty)
+		output = output+imagex+","+imagey+","+imagez+","+alpha+","+beta+","+df+","+beamshiftx+","+beamshifty+"\n"
 		capturefunction(self)
 		savefunction(self,1)
 		result("Acquisition Complete!\n")
@@ -321,10 +337,10 @@ class MainMenu : uiframe
 		string full_path = directory+file_name
 		
 		if(setting == 0){
-			LoadFunction_linear(self,full_path,xA,xB,yA,yB,zA,zB)
+			LoadFunction_linear(self,full_path,xA,xB,yA,yB,zA,zB,dfA,dfB)
 		}
 		else if(setting ==1){
-			LoadFunction_sinusoidal(self,full_path,xA,xB,xC,yA,yB,yC,zA,zB,zC)
+			LoadFunction_sinusoidal(self,full_path,xA,xB,xC,yA,yB,yC,zA,zB,zC,dfA,dfB,dfC)
 		}
 		
 	}
@@ -355,13 +371,14 @@ class MainMenu : uiframe
 	//			   it may be more convenient to just have tilt be repsonsible for shifting at the same time
 	void Shift(object self)
 	{
-		number newX,newY,newZ
+		number newX,newY,newZ,newDF
 		newX = DLGGetValue(self.lookupelement("nextX"))
 		newY = DLGGetValue(self.lookupelement("nextY"))
-		newZ = DLGGetValue(self.lookupelement("nextZ"))*1000
+		newZ = DLGGetValue(self.lookupelement("nextZ"))
+		newDF = DLGGetValue(self.lookupelement("nextDF"))
 		
-		//EMSetStagePositions(3,newX,newY,newZ,0,0)
-		//EMSetCalibratedfocus(newZ)
+		//EMSetStagePositions(7,newX,newY,newZ,0,0)
+		//EMSetCalibratedfocus(newDF)
 		
 		//EMWaitUntilReady()
 	}
@@ -372,29 +389,34 @@ class MainMenu : uiframe
 	//DISCUSS : Do we want the code to function this way?
 	void acquire(object self)
 	{
+		result("DEBUG ZONE: 0\n")
 		if(tiltComplete == 0){
 			okdialog("Please make sure tilt and stage shift have been completed")
 			return
 		}
 		captureFunction(self)
+		result("DEBUG ZONE: 0.25\n")
 		saveFunction(self,1)
+		result("DEBUG ZONE: 0.5\n")
 		string directory
 		DLGgetValue(self.lookupelement("SavePathField"),directory)
 		string fullpath = directory + export_file_name
 		result(fullpath)
 		number file = OpenFileForWriting(fullpath)
-		
-		//EMGetStagePositions(27,imagex,imagey,imagez,alpha,beta)
-		//imagez = EMGetCalibratedFocus()/1000
-		output = output + alpha+","+imagex+","+imagey+","+imagez+","+beta+"\n"
+		result("DEBUG ZONE: 1")
+		//EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta) //Units: Microns,Degrees
+		//df = EMGetCalibratedFocus/1000
+		//EMGetBeamShift(beamshiftx,beamshifty)
+		output = output+imagex+","+imagey+","+imagez+","+alpha+","+beta+","+df+","+beamshiftx+","+beamshifty+"\n"
 		WriteFile(file,output) 
 		result("File updated\n")
 		CloseFile(file)
+		result("DEBUG ZONE: 2")
 		if(setting == 0){
-				RefreshFunction_linear(self,xA,xB,yA,yB,zA,zB)
+				RefreshFunction_linear(self,xA,xB,yA,yB,zA,zB,dfA,dfB)
 			}
 		else if(setting ==1){
-				RefreshFunction_sinusoidal(self,xA,xB,xC,yA,yB,yC,zA,zB,zC)
+				RefreshFunction_sinusoidal(self,xA,xB,xC,yA,yB,yC,zA,zB,zC,dfA,dfB,dfC)
 		}
 		//EMWaitUntilReady()
 		tiltComplete = 0
