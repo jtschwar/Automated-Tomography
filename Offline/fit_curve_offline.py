@@ -4,6 +4,9 @@ import numpy as np
 import time
 import os
 import sys
+import uncertainties.unumpy as unp
+import uncertainties as unc
+
 
 # Pathing/Listening Information
 local_path = os.getcwd()
@@ -13,6 +16,40 @@ myOutput = 'model_fit.txt'
 outputPath = os.path.join(local_path, myOutput)
 oldTime = 0
 
+def error_plotting(myData,myAlpha,myAxis,myFunc):
+    #Get Curve Fit using function
+    myParams,myCov = optimize.curve_fit(myFunc, myAlpha,myData,maxfev=5000)
+    
+    #Get RMSE and Rsquared by math defintion
+    modelPredictions = myFunc(myAlpha,*myParams)
+    absError = modelPredictions - myData
+    squareError = np.square(absError)
+    meansquareError = np.mean(squareError)
+    rootmeansquareError = np.sqrt(meansquareError) #np.sqrt(((modelPredictions-myData)**2).mean())
+    
+    
+    Rsquared = 1.0 - (np.var(absError)/np.var(myData))
+    
+    # Plot on given axis
+    alpha_full = np.linspace(-90,90)
+    myAxis.plot(alpha_full,myFunc(alpha_full,*myParams), label = "Fitted")
+    myAxis.set(ylim=(min(myData),max(myData)))
+    
+    myAxis.legend(loc='upper right')
+    myAxis.text(0.5,0.1,'R^2 = %.4f\nRMSE = %.4f'%(Rsquared,rootmeansquareError),va='center',ha='center',transform=myAxis.transAxes,multialignment='left')
+    
+    ##Confidence Interval Code
+    #myCorr = unc.correlated_values(myParams, myCov)
+    #print(myCorr)
+    #py = myFunc(alpha_full,*myCorr)
+    #nom = unp.nominal_values(py)
+    #std = unp.std_devs(py)  
+    #myAxis.fill_between(alpha_full, nom - 1.96*std,nom+1.96*std, color = "black", alpha=.15)
+
+    
+    return myParams
+    
+    
 
 def check_coord():
 
@@ -25,13 +62,17 @@ def check_coord():
             global oldTime
             if(newTime != oldTime):
                 print("Modifications Detected; remodel...")
-                fit_curve()
+                fit_curve(newTime)
                 oldTime = newTime
 
 
-def fit_curve():
+def fit_curve(newTime):
     # Coordinates are saved as (alpha,x,y,z,beta) => (microns, degrees)
     coord = np.loadtxt(fullpath, delimiter=',', usecols=range(8))
+    if(coord.ndim == 1):
+        print("Need more than one coordinate!")
+        return
+    
     
     x_coord = coord[:, 0]
     y_coord = coord[:, 1]
@@ -40,21 +81,18 @@ def fit_curve():
     df_coord = coord[:,5]
 
     # #Plot Data Model
-    fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, figsize=(6, 12),sharex=True,sharey=True)
+    fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, figsize=(6, 12))
     fig.subplots_adjust(hspace=0.1, left=0.15)
     x = np.linspace(-90, 90)
     
     ax1.scatter(alpha_coord, x_coord,label='Data')
     ax1.set_title('X Fitting')
-    ax1.legend()
     
     ax2.scatter(alpha_coord, y_coord,label='Data')
     ax2.set_title('Y Fitting')
-    ax2.legend()
 
     ax3.scatter(alpha_coord, z_coord,label='Data')
     ax3.set_title('Z Fitting')
-    ax3.legend()
     
     ax4.scatter(alpha_coord, df_coord, label ='Data')
     ax4.set_title('Defocus Fitting')
@@ -67,40 +105,31 @@ def fit_curve():
     # #Plot Curve Fit based on chosen model
     global modelSetting
     if(modelSetting == "L"):
-        x_params, x_covar = optimize.curve_fit(fit_lin, alpha_coord, x_coord)
-        y_params, y_covar = optimize.curve_fit(fit_lin, alpha_coord, y_coord)
-        z_params, z_covar = optimize.curve_fit(fit_lin, alpha_coord, z_coord)
-        df_params, df_covar = optimize.curve_fit(fit_lin,alpha_coord,df_coord)
+        if(len(x_coord) < 2):
+            print("Too few points--need at least 2!\n")
+            return
+        x_params = error_plotting(x_coord,alpha_coord,ax1,fit_lin)
+        y_params = error_plotting(y_coord,alpha_coord,ax2,fit_lin)
+        z_params = error_plotting(z_coord,alpha_coord,ax3,fit_lin)
+        df_params = error_plotting(df_coord,alpha_coord,ax4,fit_lin)
             
-        ax1.plot(x,fit_lin(x,x_params[0],x_params[1]),label='Fitted')
-        ax2.plot(x,fit_lin(x,y_params[0],y_params[1]),label='Fitted')
-        ax3.plot(x,fit_lin(x,z_params[0],z_params[1]),label='Fitted')
-        ax4.plot(x,fit_lin(x,df_params[0],df_params[1]),label='Fitted')
-        
-        ax1.legend()
-        ax2.legend()
-        ax3.legend()
-        ax4.legend()
     elif(modelSetting =="S"):
-        x_params, x_covar = optimize.curve_fit(fit_cos, alpha_coord, x_coord,maxfev=5000)
-        y_params, y_covar = optimize.curve_fit(fit_cos, alpha_coord, y_coord,maxfev=5000)
-        z_params, z_covar = optimize.curve_fit(fit_cos, alpha_coord, z_coord,maxfev=5000)
-        df_params, df_covar = optimize.curve_fit(fit_cos,alpha_coord,df_coord,maxfev=5000)
-            
-        ax1.plot(x,fit_cos(x,x_params[0],x_params[1],x_params[2],x_params[3]),label='Fitted')
-        ax2.plot(x,fit_cos(x,y_params[0],y_params[1],y_params[2],y_params[3]),label='Fitted')
-        ax3.plot(x,fit_cos(x,z_params[0],z_params[1],z_params[2],z_params[3]),label='Fitted')
-        ax4.plot(x,fit_cos(x,df_params[0],df_params[1],df_params[2],df_params[3]),label='Fitted')
+        if(len(x_coord) < 4):
+            print("Too few points--need at least 4!\n")
+            return
+        x_params = error_plotting(x_coord,alpha_coord,ax1,fit_cos)
+        y_params = error_plotting(y_coord,alpha_coord,ax2,fit_cos)
+        z_params = error_plotting(z_coord,alpha_coord,ax3,fit_cos)
+        df_params = error_plotting(df_coord,alpha_coord,ax4,fit_cos)
         
-        ax1.legend()
-        ax2.legend()
-        ax3.legend()
-        ax4.legend()
     else:
         print("Model choice not recognized")
         sys.exit()
-        
+    
+    plt_title = "plot_{}.png".format(len(x_coord))
+    fig1 = plt.gcf()
     plt.show()
+    fig1.savefig(plt_title)
     
     global f
     try:
@@ -110,12 +139,6 @@ def fit_curve():
 
     
     np.savetxt(outputPath,(x_params, y_params, z_params,df_params),delimiter='\n')
-    #xString = np.array2string(x_params)
-    #yString = np.array2string(y_params)
-    #zString = np.array2string(z_params)
-    #f.write(xString)
-    #f.write(yString)
-    #f.write(zString)
 
     f.close()
 
@@ -127,7 +150,7 @@ def fit_cos(x,a,b,c,d):
 
 modelSetting = input("Sinusoidal (S) or Linear model (L)? Enter character: ")
 #Time arbitrarily set right now, a break will be needed in actual use
-for i in range(3): 
+for i in range(1): 
 
     check_coord()
     time.sleep(5)

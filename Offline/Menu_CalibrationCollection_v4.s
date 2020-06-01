@@ -13,7 +13,7 @@ string output = "" //string that is shunted through Coordinate.txt
 number deltaTilt = 1
 number CurrentTilt = 0
 number A, B, C   //To be used for y = Acos(B*theta + C) in model prediction
-number xA,xB,xC,yA,yB,yC,zA,zB,zC,dfA,dfB,dfC
+number xA,xB,xC,xD,yA,yB,yC,yD,zA,zB,zC,zD,dfA,dfB,dfC,dfD
 number tiltComplete = 0 //0 false, 1 true
 number setting = 0
 
@@ -52,8 +52,13 @@ void Correlation(image &img1, image &img2, number &x, number &y) //Borrowed from
     max( CC, mpX, mpY )                         //Position of max pixel is at (mpX, mpY)
     number sX = cx - mpX 
     number sY = cy - mpY 
-
-    Result( "Relative image shift: (" + sX + ", " + sY + ") pixels \n" )
+	result("sX =" + sX+"\n")
+	result("cX =" + cX+"\n")
+	result("mpX =" +mpX+"\n")
+	result("sY =" + sY+"\n")
+	result("cY =" + cY+"\n")
+	result("mpY =" +mpY+"\n")
+    //Result( "Relative image shift: (" + sX + ", " + sY + ") pixels \n" )
 
     //Return the current STEM field-of-view (FOV) in calibrated units according to the stored calibration.
     number scaleX = img2.imageGetDimensionScale(0)  // Returns the scale of the given dimension of image.  
@@ -340,7 +345,7 @@ class MainMenu : uiframe
 			LoadFunction_linear(self,full_path,xA,xB,yA,yB,zA,zB,dfA,dfB)
 		}
 		else if(setting ==1){
-			LoadFunction_sinusoidal(self,full_path,xA,xB,xC,yA,yB,yC,zA,zB,zC,dfA,dfB,dfC)
+			LoadFunction_sinusoidal(self,full_path,xA,xB,xC,xD,yA,yB,yC,yD,zA,zB,zC,zD,dfA,dfB,dfC,dfD)
 		}
 		
 	}
@@ -383,27 +388,28 @@ class MainMenu : uiframe
 		//EMWaitUntilReady()
 	}
 	
-	//REQUIRES: Python's A,B,C Curve_fitting given.
+	//REQUIRES: Python's A,B,C,D Curve_fitting given.
 	//MODIFIES: next*, curr*
 	//EFFECTS : Acquires Image, updates values for the next tilt-shift cycle
 	//DISCUSS : Do we want the code to function this way?
 	void acquire(object self)
 	{
-		result("DEBUG ZONE: 0\n")
+		
 		if(tiltComplete == 0){
 			okdialog("Please make sure tilt and stage shift have been completed")
 			return
 		}
 		captureFunction(self)
-		result("DEBUG ZONE: 0.25\n")
+		result("DEBUG ZONE: 0")
 		saveFunction(self,1)
-		result("DEBUG ZONE: 0.5\n")
+		result("DEBUG ZONE: 1")
 		string directory
 		DLGgetValue(self.lookupelement("SavePathField"),directory)
+		result("DEBUG ZONE: 1.25")
 		string fullpath = directory + export_file_name
-		result(fullpath)
+		
 		number file = OpenFileForWriting(fullpath)
-		result("DEBUG ZONE: 1")
+		result("DEBUG ZONE: 1.5")
 		//EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta) //Units: Microns,Degrees
 		//df = EMGetCalibratedFocus/1000
 		//EMGetBeamShift(beamshiftx,beamshifty)
@@ -416,8 +422,9 @@ class MainMenu : uiframe
 				RefreshFunction_linear(self,xA,xB,yA,yB,zA,zB,dfA,dfB)
 			}
 		else if(setting ==1){
-				RefreshFunction_sinusoidal(self,xA,xB,xC,yA,yB,yC,zA,zB,zC,dfA,dfB,dfC)
+				RefreshFunction_sinusoidal(self,xA,xB,xC,xD,yA,yB,yC,yD,zA,zB,zC,zD,dfA,dfB,dfC,dfD)
 		}
+		result("DEBUG ZONE: 3")
 		//EMWaitUntilReady()
 		tiltComplete = 0
 	}
