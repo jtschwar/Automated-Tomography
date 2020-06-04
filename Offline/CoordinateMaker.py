@@ -12,7 +12,7 @@ from scipy import optimize
 import uncertainties.unumpy as unp
 import uncertainties as unc
 
-fname=  'NiSI-1.mrc'
+fname=  'NiSi-1.mrc'
 
 tomo = mrcfile.open(fname)
 
@@ -52,6 +52,14 @@ for ii in range(ntilts):
 
 
 outputString = ''
+weightInput = input('Weighted with extrema (W)?')
+if weightInput == 'W':    
+    for ii in (np.int(0),np.int(ntilts/2),np.int(ntilts-1)):
+        print(ii)
+        string_list = [str(xx[ii]*10**6), str(yy[ii]*10**6), str(zz[ii]*10**6), str(alpha[ii]), str(beta[ii]), str(df[ii]*10**6), '0', '0']
+        outputString = outputString + ','.join(string_list) +'\n'
+else:
+    print('No weighting; continuing...')
 for ii in range(ntilts):
     string_list = [str(xx[ii]*10**6), str(yy[ii]*10**6), str(zz[ii]*10**6), str(alpha[ii]), str(beta[ii]), str(df[ii]*10**6), '0', '0']
     outputString = outputString + ','.join(string_list) +'\n'
