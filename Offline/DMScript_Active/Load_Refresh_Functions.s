@@ -16,7 +16,7 @@ number openFile(object &given, string file_name){
 	}
 	else
 	{
-		okdialog("File not found! Make sure Python loaded correctly")
+		result("[WARNING] Python Output File not found! Make sure Python loaded correctly\n")
 		return -1;
 	}
 	
@@ -27,7 +27,7 @@ number openFile(object &given, string file_name){
 void RefreshFunction_past(object given){
 	number imagex,imagey,imagez,alpha,beta,df
 	EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
-	df = EMGetCalibratedFocus()/1000
+	df = EMGetCalibratedFocus()*10000
 	dlgvalue(given.lookupelement("pastX"),imagex)
 	dlgvalue(given.lookupelement("pastY"),imagey)
 	dlgvalue(given.lookupelement("pastZ"),imagez)
@@ -40,7 +40,7 @@ void RefreshFunction_past(object given){
 void RefreshFunction_curr(object given){
 	number imagex,imagey,imagez,alpha,beta,df
 	EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
-	df = EMGetCalibratedFocus()/1000
+	df = EMGetCalibratedFocus()/10000
 	dlgvalue(given.lookupelement("currX"),imagex)
 	dlgvalue(given.lookupelement("currY"),imagey)
 	dlgvalue(given.lookupelement("currZ"),imagez)
@@ -83,7 +83,7 @@ void LoadFunction_linear(object &given,string file_name, number &xA,number &xB, 
 	number file = openFile(given,file_name)
 	String temporary
 	if(file == -1){
-		okdialog(file_name + "\n cannot be opened!\nModel coefficients not updated.")
+		result("[WARNING]" + file_name + "\n cannot be opened!\nModel coefficients not updated.\n")
 		return
 	}
 	object myStream = newStreamFromFileReference(file,0)
@@ -122,7 +122,7 @@ void LoadFunction_sinusoidal(object &given,string file_name, number &xA,number &
 	number file = openFile(given,file_name)
 	String temporary
 	if(file == -1){
-		okdialog(file_name + "\n cannot be opened!\nModel coefficients not updated.")
+		result("[WARNING]" + file_name + "\n cannot be opened!\nModel coefficients not updated.\n")
 		return
 	}
 	object myStream = newStreamFromFileReference(file,0)

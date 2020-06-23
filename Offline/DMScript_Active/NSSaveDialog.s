@@ -156,7 +156,7 @@ void SaveFunction(object given, number fieldNo)
             number oldPos = pos;
             String next_key = findnextkeyname( save_string, pos );
             String added = "";
-			result(next_key+"\n")
+			// result(next_key+"\n")
 
             //D,Date; T,Time; V, Voltage; M, mag; L, length; o, Mode; R, Brightness; S spot; A alpha; B beta
 

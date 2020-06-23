@@ -272,7 +272,7 @@ void EMGetStagePositions(Number axisFlags, Number &x, Number &y, Number &z, Numb
 		x = 75
 		axisFlags = axisFlags-1
 		}
-	return 0
+	return 
 }
 
 void EMGetStageXY(Number &x, Number &y){

@@ -31,7 +31,7 @@ number shift_safety = 0.5
 void acquire_coordinate()
 {
 	EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
-	df = EMGetCalibratedFocus()/1000
+	df = EMGetCalibratedFocus()*10000
 	EMGetBeamShift(beamshiftx,beamshifty)
 	output = output+imagex+","+imagey+","+imagez+","+alpha+","+beta+","+df+","+beamshiftx+","+beamshifty+"\n"
 }
@@ -437,7 +437,7 @@ class MainMenu : uiframe
 		newDF = P_nextDF
 		
 		EMGetStagePositions(31,currX,currY,currZ,alpha,beta)
-		currDF = EMGetCalibratedFocus()/1000
+		currDF = EMGetCalibratedFocus()*10000
 		changeX = abs(newX-currX)
 		changeY = abs(newY-currY)
 		changeZ = abs(newZ-currZ)
@@ -461,7 +461,7 @@ class MainMenu : uiframe
 		}
 		
 		EMSetStagePositions(7,newX,newY,newZ,0,0)
-		EMSetCalibratedfocus(newDF*1000)
+		EMSetCalibratedfocus(newDF/10000)
 		
 		//EMWaitUntilReady()
 		RefreshFunction_curr(self)
