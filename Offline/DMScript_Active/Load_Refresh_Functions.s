@@ -26,8 +26,8 @@ number openFile(object &given, string file_name){
 //NOTE   : Call this during a saved_to_tilt_image command for user's benefit
 void RefreshFunction_past(object given){
 	number imagex,imagey,imagez,alpha,beta,df
-	EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
-	df = EMGetCalibratedFocus()*10000
+	EMGetStagePositions(15,imagex,imagey,imagez,alpha,beta)
+	df = EMGetFocus()*10000
 	dlgvalue(given.lookupelement("pastX"),imagex)
 	dlgvalue(given.lookupelement("pastY"),imagey)
 	dlgvalue(given.lookupelement("pastZ"),imagez)
@@ -39,8 +39,8 @@ void RefreshFunction_past(object given){
 //NOTE   : Call this during basically any interaction; ensures user is seeing most relevant information
 void RefreshFunction_curr(object given){
 	number imagex,imagey,imagez,alpha,beta,df
-	EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
-	df = EMGetCalibratedFocus()/10000
+	EMGetStagePositions(15,imagex,imagey,imagez,alpha,beta)
+	df = EMGetFocus()/10000
 	dlgvalue(given.lookupelement("currX"),imagex)
 	dlgvalue(given.lookupelement("currY"),imagey)
 	dlgvalue(given.lookupelement("currZ"),imagez)

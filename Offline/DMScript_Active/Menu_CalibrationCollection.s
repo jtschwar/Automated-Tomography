@@ -24,16 +24,53 @@ number X_shiftX,X_shiftY
 
 number shift_safety = 0.5
 
+//REQUIRES: Accurate Magnification read-in
+//EFFECTS : Returns appropriate mag->pixel
+number magToPixel(number mag){
+	number m;
+	number b;
+	
+	if(mag < 320e3){ //Low Mag
+		m = 2.357e-4
+		b = -4.1957e-11
+	}
+	else if(mag < 5.1e6){
+		m = 2.359e-4
+		b = -2.5336e-12
+	}
+	else{
+		m = 2.3441e-4
+		b = -7.2217e-14
+	}
+	return (1/mag * m + b);
+}
+
+// EFFECTS: Spit out current global and internal variables for user's benefit
+void debugTrigger(object self){
+	result("DEBUG: Predicted X Position: " + P_nextX + "\n")
+	result("DEBUG: Predicted Y Position: " + P_nextY + "\n")
+	result("DEBUG: Predicted Z Position: " + P_nextZ + "\n")
+	result("DEBUG: XCorr Shift X: " + X_shiftX + "\n")
+	result("DEBUG: XCorr Shift Y: " + X_shiftX + "\n")
+	result("DEBUG: (xA,xB,xC,xD): (" + xA + ","+ xB +","+ xC +","+ xD +")\n")
+	result("DEBUG: (yA,yB,yC,yD): (" + yA +","+ yB +","+ yC +","+ yD +")\n")
+	result("DEBUG: (zA,zB,zC,zD): (" + zA +","+ zB +","+ zC +","+ zD +")\n")
+	
+	
+	
+}
+
 //REQUIRES: Appropriate Imaging environment
 //MODIFIES: output
 //EFFECTS : Acquire x, y, z, alpha, beta, df, beamshiftX, beamshiftY values and load it into a global variable "output"
 //NOTES   : "output" is the string that is shunted through Coordinate.txt
 void acquire_coordinate()
 {
-	EMGetStagePositions(31,imagex,imagey,imagez,alpha,beta)
-	df = EMGetCalibratedFocus()*10000
-	EMGetBeamShift(beamshiftx,beamshifty)
+	EMGetStagePositions(15,imagex,imagey,imagez,alpha,beta)
+	df = EMGetFocus()*10000
+	// EMGetBeamShift(beamshiftx,beamshifty)
 	output = output+imagex+","+imagey+","+imagez+","+alpha+","+beta+","+df+","+beamshiftx+","+beamshifty+"\n"
+	okdialog("Coordinates Acquired!")
 }
 	
 //EFFECTS : Creates Coordinate.txt with "output" in given SavePath
@@ -46,6 +83,7 @@ void export_coordinate(object self)
 	number file = CreateFileForWriting(fullpath)
 	WriteFile(file, output)
 	CloseFile(file)
+	okdialog("Coordinates Exported!")
 }
 
 //MODIFIES: Global Next* variables
@@ -121,9 +159,12 @@ void Correlation(image &img1, image &img2, number &x, number &y) //Borrowed from
     //Result( "Relative image shift: (" + sX + ", " + sY + ") pixels \n" )
 
     //Return the current STEM field-of-view (FOV) in calibrated units according to the stored calibration.
-    number scaleX = img2.imageGetDimensionScale(0)  // Returns the scale of the given dimension of image.  
-    number scaleY = img2.imageGetDimensionScale(1)   
-    x = sX*scaleX
+    //number scaleX = img2.imageGetDimensionScale(0)  // Returns the scale of the given dimension of image.  
+    //number scaleY = img2.imageGetDimensionScale(1)   
+    number scaleX = magToPixel(EMGetMagnification())
+    number scaleY = magToPixel(EMGetMagnification())
+    
+	x = sX*scaleX
     y = sY*scaleY   
 
     Result("Relative image shift: (" + x + ", " + y + ") Microns \n" ) 
@@ -259,8 +300,15 @@ TagGroup TomoDialog()
 	TagGroup x_shiftFields = DLGGroupitems(X_shiftlabel,x_shiftX,X_shiftY).dlgtablelayout(3,1,0)
 	TagGroup XCorr_combined = DLGGroupitems(CalcXCorr_button,X_shiftFields,ShiftXCorr_button).dlgtablelayout(1,3,1)
 	
-	TagGroup Button_column = DLGGroupItems(Image_combined,TiltButtons_combined,ShiftModel_button,XCorr_combined).dlgtablelayout(1,4,0)
+	TagGroup Button_column_T = DLGGroupItems(Image_combined,TiltButtons_combined,ShiftModel_button,XCorr_combined).dlgtablelayout(1,4,0)
 	//END Button Column
+	
+	// Debug Button
+	TagGroup Debug_items = newTagGroup()
+	TagGroup Debug_box = DLGCreateBox("Debug ", debug_items)
+	TagGroup Debug_button = DLGCreatePushButton("DEBUG","debug")
+	debug_items.DLGAddElement(Debug_button)
+	TagGroup Button_column = DLGGroupitems(Button_column_T,Debug_box).dlgtablelayout(1,2,0)
 	
 	//Final Organization Defining
 	TagGroup topright_block = DLGGroupItems(Tilt_Box,Load_Box).dlgtablelayout(2,1,1)
@@ -338,6 +386,7 @@ class MainMenu : uiframe
 		result("Loading Python...\n")
 		load_coefficients(self)
 		result("Complete!\n")
+		okdialog("Refresh Complete")
 	}
 	
 	//MODIFIES: current, "Current" image
@@ -349,6 +398,7 @@ class MainMenu : uiframe
 		current := getfrontimage()
 		RefreshFunction_curr(self)
 		result("Take Complete!\n")
+		okdialog("Image Taken")
 	}
 	
 	//MODIFIES: past (image), Coordinates.txt, 
@@ -363,6 +413,7 @@ class MainMenu : uiframe
 		RefreshFunction_past(self)
 		RefreshFunction_curr(self)
 		result("Save Complete!")
+		okdialog("Image Saved")
 	}
 	
 	//MODIFIES: stageTilt
@@ -391,6 +442,7 @@ class MainMenu : uiframe
 		lock_next(self)
 		
 		result("Tilt complete!\n")
+		okdialog("Tilt Plus Complete")
 	}
 	
 	//MODIFIES: stageTilt
@@ -419,6 +471,7 @@ class MainMenu : uiframe
 		lock_next(self)
 		
 		result("Tilt complete!\n")
+		okdialog("Tilt Negative Complete!")
 	}
 	
 	//REQUIRES: NextValues are calculated
@@ -436,8 +489,8 @@ class MainMenu : uiframe
 		newZ = P_nextZ
 		newDF = P_nextDF
 		
-		EMGetStagePositions(31,currX,currY,currZ,alpha,beta)
-		currDF = EMGetCalibratedFocus()*10000
+		EMGetStagePositions(15,currX,currY,currZ,alpha,beta)
+		currDF = EMGetFocus()*10000
 		changeX = abs(newX-currX)
 		changeY = abs(newY-currY)
 		changeZ = abs(newZ-currZ)
@@ -461,11 +514,12 @@ class MainMenu : uiframe
 		}
 		
 		EMSetStagePositions(7,newX,newY,newZ,0,0)
-		EMSetCalibratedfocus(newDF/10000)
+		EMSetfocus(newDF/10000)
 		
 		//EMWaitUntilReady()
 		RefreshFunction_curr(self)
 		result("Model Shift Complete!\n")
+		okdialog("Shift Button Complete")
 	}
 	
 	//MODIFIES: 'Reference' image
@@ -488,6 +542,7 @@ class MainMenu : uiframe
 		
 		RefreshFunction_curr(self)
 		result("XCORR Complete!\n")
+		okdialog("Cross Correlation Calculated")
 	}
 	//MODIFIES: Stage Positions
 	//EFFECTS : Using script-held X_nextX/Y values, shift the stage. Checks if moves beyond a safety factor
@@ -518,6 +573,11 @@ class MainMenu : uiframe
 		//EMWaitUntilReady()
 		RefreshFunction_curr(self)
 		result("XCORR Shift Complete!\n")
+		okdialog("XCORR Shifted")
+	}
+	
+	void debug(object self){
+		debugTrigger(self)
 	}
 	
 	//------END Tomography Functions----//

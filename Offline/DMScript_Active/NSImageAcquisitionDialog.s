@@ -60,7 +60,10 @@ TagGroup MakeAcqDialog()
 	TagGroup detect_label = DLGCreateLabel("Select Detector: ")
 	TagGroup detect1_check = DLGCreateCheckBox("1",1).dlgidentifier("detect1_check")
 	TagGroup detect2_check = DLGCreateCheckBox("2",0).dlgidentifier("detect2_check")
-	TagGroup detect_region = dlgGroupitems(detect_label, detect1_check,detect2_check).dlgtablelayout(3,1,0)
+	TagGroup detect3_check = DLGCreateCheckBox("3",0).dlgidentifier("detect3_check")
+	TagGroup detect4_check = DLGCreateCheckBox("4",0).dlgidentifier("detect4_check")
+	TagGroup detect_check_Total = dlgGroupItems(detect1_check,detect2_check,detect3_check,detect4_check).dlgtablelayout(4,1,0)
+	TagGroup detect_region = dlgGroupitems(detect_label, detect_check_Total).dlgtablelayout(3,1,0)
 	
 	TagGroup Label_column = DLGGroupitems(dwell_label,dim_label,Image_Label,rotation_label).dlgtablelayout(1,4,0)
 	TagGroup entry_column = DLGGroupitems(dwellField,DimField,imageNumField,rotationfield).dlgTablelayout(1,4,1)
@@ -116,7 +119,17 @@ void captureFunction(object given, string Cycler)
 	if(dlgGetValue(given.lookupelement("detect2_check")))
 	{	
 		detectChecks += 1
-		DSSetParametersSignal(paramID,0,dataDepth,acquire,imageID)
+		DSSetParametersSignal(paramID,1,dataDepth,acquire,imageID)
+	}
+	if(dlgGetValue(given.lookupelement("detect3_check")))
+	{	
+		detectChecks += 1
+		DSSetParametersSignal(paramID,2,dataDepth,acquire,imageID)
+	}
+	if(dlgGetValue(given.lookupelement("detect4_check")))
+	{	
+		detectChecks += 1
+		DSSetParametersSignal(paramID,3,dataDepth,acquire,imageID)
 	}
 	if (detectChecks == 0)
 	{
