@@ -67,6 +67,6 @@ image noise_reduction(image img){
 	converttopackedcomplex(masked)
 	image invfiltered =packedIFFT(masked)
 	setname(invfiltered, "Filtered: " + name)
-	showimage(invfiltered)
+	//showimage(invfiltered)
 	return invfiltered
 }

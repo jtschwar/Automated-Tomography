@@ -163,53 +163,53 @@ void SaveFunction(object given, number fieldNo)
 
             if(next_key=="D")//Date
             {
-				added = "[date]"
-                //added = getDate();
+				//added = "[date]"
+                added = getDate();
             }
             else if(next_key=="T")//Time
             {
-				added = "[time]"
-                //added = getTime();
+				//added = "[time]"
+                added = getTime();
 
             }
             else if(next_key=="V")//Voltage
             {
-                added = "[voltage]"
-                //added = ""+EMGetHighTension( );
+                //added = "[voltage]"
+                added = ""+EMGetHighTension( );
             }
             else if(next_key=="M")//Mag
             {
-				added = "[mag]"
-                //added = ""+EMGetMagnification( );
+				//added = "[mag]"
+                added = ""+EMGetMagnification( );
 
             }
             else if(next_key=="L")//cam len
             {
-				added = "[length]"
-                //added = ""+EMGetCameraLength();
+				//added = "[length]"
+                added = ""+EMGetCameraLength();
 
             }
             else if(next_key=="O")//operation mode
             {
-				added = "[Operation]"
-               // added = ""+EMGetOperationMode( );
+				//added = "[Operation]"
+               added = ""+EMGetOperationMode( );
 
             }
             else if(next_key=="R")//Brightness
             {
-				added = "[brightness]"
-                //added = ""+EMGetBrightness();
+				//added = "[brightness]"
+                added = ""+EMGetBrightness();
 
             }
             else if(next_key=="S")
             {
-				added = "[spot]"
-                //added=""+EMGetSpotSize( );
+				//added = "[spot]"
+                added=""+EMGetSpotSize( );
             }
             else if(next_key=="A")
             {
-				added = "[alpha]"
-               // added=""+EMGetStageAlpha( );
+				//added = "[alpha]"
+               added=""+EMGetStageAlpha( );
             }
             else if(next_key=="B")
             {
@@ -218,18 +218,18 @@ void SaveFunction(object given, number fieldNo)
             }
             else if(next_key=="X")
             {
-				added = "[X]"
-                //added=""+EMGetStageX();
+				//added = "[X]"
+                added=""+EMGetStageX();
             }
             else if(next_key=="Y")
             {
-				added = "[Y]"
-                //added=""+EMGetStageY();
+				//added = "[Y]"
+                added=""+EMGetStageY();
             }
             else if(next_key=="Z")
             {
-				added = "[Z]"
-                //added=""+EMGetStageZ();
+				//added = "[Z]"
+                added=""+EMGetStageZ();
             }
             else if(next_key != "")
             {

@@ -1,7 +1,5 @@
-//Step 1 Code: Get 3 images (manually setting), gather their coordinates, export info to textfile
-//WIP, ask Jacob if any questions on functionality
-
-//TO-DO:
+//Generalized Menu Code that utilizes: NSSaveDialog, NSImageAcquisitionDialog, Load_Refresh_Functions, Filtering_Functions
+//Either install these scripts individually OR combine them into a singular file
 
 //Global Variables
 number imagex,imagey,imagez,df
@@ -16,13 +14,14 @@ number xA,xB,xC,xD,yA,yB,yC,yD,zA,zB,zC,zD,dfA,dfB,dfC,dfD
 number tiltComplete = 0 //0 false, 1 true
 number setting = 0
 image past, current
+image reference_image, pastFiltered_image, refFiltered_image, XCorr_Image
 
 //HOLD these values and use these specifically. Do NOT want a user to adjust fields and thus
 //change where shifts occur
 number P_nextX,P_nextY,P_nextZ,P_nextDF,P_nextTilt
 number X_shiftX,X_shiftY
 
-number shift_safety = 0.5
+number shift_safety = 1.0
 
 //REQUIRES: Accurate Magnification read-in
 //EFFECTS : Returns appropriate mag->pixel
@@ -47,16 +46,17 @@ number magToPixel(number mag){
 
 // EFFECTS: Spit out current global and internal variables for user's benefit
 void debugTrigger(object self){
-	result("DEBUG: Predicted X Position: " + P_nextX + "\n")
-	result("DEBUG: Predicted Y Position: " + P_nextY + "\n")
-	result("DEBUG: Predicted Z Position: " + P_nextZ + "\n")
-	result("DEBUG: XCorr Shift X: " + X_shiftX + "\n")
-	result("DEBUG: XCorr Shift Y: " + X_shiftX + "\n")
-	result("DEBUG: (xA,xB,xC,xD): (" + xA + ","+ xB +","+ xC +","+ xD +")\n")
-	result("DEBUG: (yA,yB,yC,yD): (" + yA +","+ yB +","+ yC +","+ yD +")\n")
-	result("DEBUG: (zA,zB,zC,zD): (" + zA +","+ zB +","+ zC +","+ zD +")\n")
+	string debugOutput = ""
+	debugOutput = debugOutput + "DEBUG: Predicted X Position: " + P_nextX + "\n"
+	debugOutput = debugOutput + "DEBUG: Predicted Y Position: " + P_nextY + "\n"
+	debugOutput = debugOutput + "DEBUG: Predicted Z Position: " + P_nextZ + "\n"
+	debugOutput = debugOutput + "DEBUG: XCorr Shift X: " + X_shiftX + "\n"
+	debugOutput = debugOutput + "DEBUG: XCorr Shift Y: " + X_shiftX + "\n"
+	debugOutput = debugOutput + "DEBUG: (xA,xB,xC,xD): (" + xA + ","+ xB +","+ xC +","+ xD +")\n"
+	debugOutput = debugOutput + "DEBUG: (yA,yB,yC,yD): (" + yA +","+ yB +","+ yC +","+ yD +")\n"
+	debugOutput = debugOutput + "DEBUG: (zA,zB,zC,zD): (" + zA +","+ zB +","+ zC +","+ zD +")\n"
 	
-	
+	okdialog(debugOutput)
 	
 }
 
@@ -67,7 +67,7 @@ void debugTrigger(object self){
 void acquire_coordinate()
 {
 	EMGetStagePositions(15,imagex,imagey,imagez,alpha,beta)
-	df = EMGetFocus()*10000
+	df = EMGetFocus()
 	// EMGetBeamShift(beamshiftx,beamshifty)
 	output = output+imagex+","+imagey+","+imagez+","+alpha+","+beta+","+df+","+beamshiftx+","+beamshifty+"\n"
 	okdialog("Coordinates Acquired!")
@@ -95,7 +95,9 @@ void lock_next(object given){
 	DLGGetvalue(given.lookupelement("nextZ"),P_nextZ)
 	DLGGetvalue(given.lookupelement("nextDF"),P_nextDF)
 	DLGGetvalue(given.lookupelement("nextTilt"),P_nextTilt)
-	
+	//string debugVals = " "
+	//debugVals = debugVals + "Xpredict: " + P_nextX + ", Ypredict: " + P_nextY + ", Zpredict: " + P_nextZ + "\n" 
+	//okdialog(debugVals)
 }
 
 //MODIFIES: modeling coefficients
@@ -142,12 +144,12 @@ void Correlation(image &img1, image &img2, number &x, number &y) //Borrowed from
     ref[ 0, 0, sy2, sx2 ] = img2
     
     // STEP 2: Cross-Correlate images and find maximum correlation
-    image CC := CrossCorrelate( src, ref )
+    XCorr_image = CrossCorrelate( src, ref )
     String Name = "Correlation"
-    SetName(CC, Name)
-    ShowImage(CC)                               //Show the cross correlation. 
+    SetName(XCorr_image, Name)
+    ShowImage(XCorr_image)                               //Show the cross correlation. 
     number mpX, mpY
-    max( CC, mpX, mpY )                         //Position of max pixel is at (mpX, mpY)
+    max( XCorr_image, mpX, mpY )                         //Position of max pixel is at (mpX, mpY)
     number sX = cx - mpX 
     number sY = cy - mpY 
 	result("sX =" + sX+"\n")
@@ -161,13 +163,20 @@ void Correlation(image &img1, image &img2, number &x, number &y) //Borrowed from
     //Return the current STEM field-of-view (FOV) in calibrated units according to the stored calibration.
     //number scaleX = img2.imageGetDimensionScale(0)  // Returns the scale of the given dimension of image.  
     //number scaleY = img2.imageGetDimensionScale(1)   
+    string debugMag = " "
     number scaleX = magToPixel(EMGetMagnification())
     number scaleY = magToPixel(EMGetMagnification())
+    debugMag = debugMag + scaleX + ' ' + scaleY + ' ' + EMGetMagnification()
+    //okdialog(debugMag)
     
-	x = sX*scaleX
-    y = sY*scaleY   
+    //string debugScale = "Shift X: " + sX + ", Scale X: " + scaleX + "(m), Scale X: " + scaleX*10**6 
+    //okdialog(debugScale)
+    
+	x = sX*scaleX*10**6
+    y = sY*scaleY*10**6   
 
     Result("Relative image shift: (" + x + ", " + y + ") Microns \n" ) 
+    okdialog("Relative image shift: (" + x + ", " + y + ") Microns \n")
 
 }
 
@@ -303,12 +312,15 @@ TagGroup TomoDialog()
 	TagGroup Button_column_T = DLGGroupItems(Image_combined,TiltButtons_combined,ShiftModel_button,XCorr_combined).dlgtablelayout(1,4,0)
 	//END Button Column
 	
-	// Debug Button
-	TagGroup Debug_items = newTagGroup()
-	TagGroup Debug_box = DLGCreateBox("Debug ", debug_items)
+	// Supplemental Buttons
+	TagGroup Supp_items = newTagGroup()
+	TagGroup Supp_box = DLGCreateBox("Supp.", Supp_items)
 	TagGroup Debug_button = DLGCreatePushButton("DEBUG","debug")
-	debug_items.DLGAddElement(Debug_button)
-	TagGroup Button_column = DLGGroupitems(Button_column_T,Debug_box).dlgtablelayout(1,2,0)
+	
+	TagGroup zeroDF_button = DLGCreatePushButton("Zero dF", "zero_df")
+	
+	supp_items.DLGAddElement(DLGGroupitems(debug_button,zeroDF_button).DLGtablelayout(2,1,0))
+	TagGroup Button_column = DLGGroupitems(Button_column_T,Supp_box).dlgtablelayout(1,2,0)
 	
 	//Final Organization Defining
 	TagGroup topright_block = DLGGroupItems(Tilt_Box,Load_Box).dlgtablelayout(2,1,1)
@@ -383,9 +395,9 @@ class MainMenu : uiframe
 	void refresh(object self)
 	{
 		RefreshFunction_curr(self)
-		result("Loading Python...\n")
 		load_coefficients(self)
-		result("Complete!\n")
+		RefreshFunction_next(self, setting, xA,xB,xC,xD,yA,yB,yC,yD,zA,zB,zC,zD,dfA,dfB,dfC,dfD);
+		lock_next(self)
 		okdialog("Refresh Complete")
 	}
 	
@@ -490,7 +502,7 @@ class MainMenu : uiframe
 		newDF = P_nextDF
 		
 		EMGetStagePositions(15,currX,currY,currZ,alpha,beta)
-		currDF = EMGetFocus()*10000
+		currDF = EMGetFocus()
 		changeX = abs(newX-currX)
 		changeY = abs(newY-currY)
 		changeZ = abs(newZ-currZ)
@@ -508,13 +520,13 @@ class MainMenu : uiframe
 			okdialog("Z Shift of " + changeZ + " violates Safety Factor of "+ shift_safety)
 			return 
 		}
-		if(changeDF > shift_safety){
-			okdialog("DF Shift of " + changeDF + " violates Safety Factor of "+ shift_safety)
-			return 
-		}
+		//if(changeDF > shift_safety){
+		//	okdialog("DF Shift of " + changeDF + " violates Safety Factor of "+ shift_safety)
+		//	return 
+		//}
 		
 		EMSetStagePositions(7,newX,newY,newZ,0,0)
-		EMSetfocus(newDF/10000)
+		//EMSetfocus(newDF)
 		
 		//EMWaitUntilReady()
 		RefreshFunction_curr(self)
@@ -527,19 +539,31 @@ class MainMenu : uiframe
 	//				Currently applies a butterworth filter to both images to filter
 	void calc_x_corr(object self){
 		result("Beginning XCORR...\n")
+		string pastName = getname(past)
 		number sx, sy
 		number imagex,imagey,dummy
-		captureFunction(self, "Reference")
-		image reference := getfrontimage()
-		image past_reduc = noise_reduction(past)
-		image reference_reduc = noise_reduction(reference)
-		Correlation(reference_reduc, past_reduc,sx,sy)
+
+		captureFunction(self, "Getting Reference")
+		image getting_reference := getfrontimage()
+		reference_image = getting_reference
+		setName(reference_image,"Reference")
+		deleteImage(getting_reference)
+
+		pastFiltered_image = noise_reduction(past)
+		setName(pastFiltered_image, "Filter: " + pastName)
+		refFiltered_image = noise_reduction(reference_image)
+		setName(refFiltered_image, "Filtered: Reference")
+		Correlation(refFiltered_image, pastFiltered_image,sx,sy)
 		EMGetStagePositions(3,imagex,imagey,dummy,dummy,dummy)
 		X_shiftX = sx
 		X_shiftY = sy
 		DLGvalue(self.lookupelement("X_shiftX"),X_shiftX)
-		DLGvalue(self.lookupelement("X_shiftY"),X_shiftX)
-		
+		DLGvalue(self.lookupelement("X_shiftY"),X_shiftY)
+
+		showImage(reference_image)
+		showImage(pastFiltered_image)
+		showImage(refFiltered_image)
+		showImage(Xcorr_image)		
 		RefreshFunction_curr(self)
 		result("XCORR Complete!\n")
 		okdialog("Cross Correlation Calculated")
@@ -566,7 +590,7 @@ class MainMenu : uiframe
 			return 
 		}
 		
-		newX = currX + x_shiftX
+		newX = currX - x_shiftX
 		newY = currY + x_shiftY
 		EMSetStagePositions(3,newX,newY,0,0,0)
 		
@@ -578,6 +602,12 @@ class MainMenu : uiframe
 	
 	void debug(object self){
 		debugTrigger(self)
+	}
+	
+	void zero_df(object self){
+		EMSetFocus(0)
+		EMWaitUntilReady()
+		okdialog("Defocus Zeroed")
 	}
 	
 	//------END Tomography Functions----//

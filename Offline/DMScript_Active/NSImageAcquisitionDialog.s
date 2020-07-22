@@ -157,5 +157,3 @@ void captureFunction(object given, string Cycler)
 	cycle(Cycler)
 	result("Capture Complete!\n")
 }
-
-

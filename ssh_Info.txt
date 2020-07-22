@@ -1,0 +1,8 @@
+GENERAL FORM FOR ssh
+ssh emal@emalserver.engin.umich.edu
+Password: emalemal
+Directory path: /Volumes/Old EMAL Server Data/NewEMALServer2/Talos/Hovden_Group/JSchwartz
+
+
+GENERAL FORM FOR scp
+scp "emal@emalserver.engin.umich.edu:/Volumes/Old\ EMAL\ Server\ Data/NewEMALServer2/Talos/Hovden_Group/JSchwartz/AutoTomo_Scripts/*.s" .                                                                                

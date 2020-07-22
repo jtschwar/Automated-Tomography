@@ -27,7 +27,7 @@ number openFile(object &given, string file_name){
 void RefreshFunction_past(object given){
 	number imagex,imagey,imagez,alpha,beta,df
 	EMGetStagePositions(15,imagex,imagey,imagez,alpha,beta)
-	df = EMGetFocus()*10000
+	df = EMGetFocus()
 	dlgvalue(given.lookupelement("pastX"),imagex)
 	dlgvalue(given.lookupelement("pastY"),imagey)
 	dlgvalue(given.lookupelement("pastZ"),imagez)
@@ -40,7 +40,7 @@ void RefreshFunction_past(object given){
 void RefreshFunction_curr(object given){
 	number imagex,imagey,imagez,alpha,beta,df
 	EMGetStagePositions(15,imagex,imagey,imagez,alpha,beta)
-	df = EMGetFocus()/10000
+	df = EMGetFocus()
 	dlgvalue(given.lookupelement("currX"),imagex)
 	dlgvalue(given.lookupelement("currY"),imagey)
 	dlgvalue(given.lookupelement("currZ"),imagez)
@@ -51,24 +51,39 @@ void RefreshFunction_curr(object given){
 //EFFECTS: Use *A,*B,*C,*D to calculate next model position
 //NOTES  : Call during every TILT command to ensure model is reading correct modern tilt
 void RefreshFunction_next(object given, number setting, number xA,number xB, number xC, number xD,number yA, number yB, number yC, number yD,number zA, number zB, number zC, number zD,number dfA, number dfB, number dfC, number dfD){
-	number alpha
-	alpha = EMGetStageAlpha()
-	alpha = alpha*Pi()/180 //Convert to radians for DMScript math
-	if(setting == 1){
+	number alpha, alphaGet
+	alphaGet = EMGetStageAlpha()
+	alpha = alphaGet*Pi()/180 //Convert to radians for DMScript math
+	number nextX,nextY,nextZ,nextDf
+	if(setting == 0){
+		nextX = alpha*xA+xB
+		nextY = alpha*yA+yB
+		nextZ = alpha*zA+zB
+		nextDF = alpha*dfA+dfB
+		//number nextAngle = (alpha + DLGGetValue(given.lookupelement("deltatiltfield")))*Pi()/180
+
+	}
+	else if(setting == 1){
+		nextX = xA*cos(alpha*xB+xC)+xD
+		nextY = yA*cos(alpha*yB+yC)+yD
+		nextZ = zA*cos(alpha*zB+zC)+zD
+		nextdf = dfA*cos(alpha*dfB+dfC)+dfD
+		//number nextAngle = (alpha + DLGGetValue(given.lookupelement("deltatiltfield")))*Pi()/180
 		
-		//number nextAngle = (alpha + DLGGetValue(given.lookupelement("deltatiltfield")))*Pi()/180
-		dlgvalue(given.lookupelement("nextX"), alpha*xA+xB)
-		dlgvalue(given.lookupelement("nextY"), alpha*yA+yB)
-		dlgValue(given.lookupelement("nextZ"), alpha*zA+zB)
-		dlgValue(given.lookupelement("nextDF"), alpha*dfA+dfB)
 	}
-	else if(setting == 0){
-		//number nextAngle = (alpha + DLGGetValue(given.lookupelement("deltatiltfield")))*Pi()/180
-		dlgvalue(given.lookupelement("nextX"), xA*cos(alpha*xB+xC)+xD)
-		dlgvalue(given.lookupelement("nextY"), yA*cos(alpha*yB+yC)+yD)
-		dlgValue(given.lookupelement("nextZ"), zA*cos(alpha*zB+zC)+zD)
-		dlgValue(given.lookupelement("nextDF"), dfA*cos(alpha*dfB+dfC)+dfD)
-	}
+	dlgvalue(given.lookupelement("nextX"), nextX)
+	dlgvalue(given.lookupelement("nextY"), nextY)
+	dlgValue(given.lookupelement("nextZ"), nextZ)
+	dlgValue(given.lookupelement("nextDF"), nextDF)
+	dlgValue(given.lookupelement("nextTilt"), alpha)
+	//string debugVals = " "
+	//debugVals = debugVals + "Alpha (Degrees): " + EMGetStageAlpha() + " Alpha (Radians): " + alpha + "\n"
+	//debugVals = debugVals + "Xparams: " + xA + ", " + xB + ", " + xC + ", " + xD + "\n"
+	//debugVals = debugVals + "Yparams: " + yA	+ ", " + yB + ", " + yC + ", " + yD + "\n"
+	//debugVals = debugVals + "Zparams: " + zA + ", " + zB + ", " + zC + ", " + zD + "\n"		
+	//debugVals = debugVals + "DFparams: " + dfA + ", " + dfB + ", " + dfC + ", " + dfD + "\n"
+	//debugVals = debugVals + "Xpredict: " + nextX + ", Ypredict: " + nextY + ", Zpredict: " + nextZ + "\n" 
+	//okdialog(debugVals)
 }
 //------MAIN FUNCTION-----//
 
@@ -165,5 +180,3 @@ void LoadFunction_sinusoidal(object &given,string file_name, number &xA,number &
 	closefile(file)
 		
 }
-
-
